@@ -1,0 +1,2 @@
+# DDIT-BEGINNER
+24.4.12. DDIT 초급프로젝트
