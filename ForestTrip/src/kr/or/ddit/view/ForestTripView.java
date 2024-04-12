@@ -241,37 +241,58 @@ public class ForestTripView {
 	////////////////////
 	protected View userMyPage() {
 		System.out.println("사용자 마이페이지");
-		
+
 		System.out.println("돌아가기");
 		String pw = ScanUtil.nextLine("마이페이지에 들어가기 위해 비밀번호를 입력하세요 : ");
-		
+
 		boolean flag = false;
-		if(!flag) {
+		if (!flag) {
 			String pw_re = ScanUtil.nextLine("비밀번호를 재 입력하세요 : ");
-			
-		}else {
+
+		} else {
 			int sel = ScanUtil.nextInt("메뉴 번호를 선택하세요 : ");
 			System.out.println("1. 사용자 정보 수정");
 			System.out.println("2. 휴양림 / 숙소 리뷰 작성");
 			System.out.println("3. 회원탈퇴");
 			System.out.println("0. 돌아가기");
-			
-			if(sel == 1) {
+
+			if (sel == 1) {
 				return View.USER_MYPAGE_EDIT;
-			}else if(sel == 2) {
+			} else if (sel == 2) {
 				return View.USER_MYPAGE_FOREST_REVIEW;
-			}else if(sel == 3) {
-				
+			} else if (sel == 3) {
+				return View.USER_QUIT;
 			}
 		}
-		
-		return null;
+
+		return View.USER_HOME;
 	}
 
 	protected View userMyPageEdit() {
-		System.out.println("사용자정보 수정");
+		System.out.println("사용자정보 수정페이지");
+
 		System.out.println("사용자는 비밀번호, 전화번호, 주소를 변경할 수 있음");
 		System.out.println("비밀번호는 1, 전화번호는 2, 주소는 3을 입력하세요");
+
+		int sel = ScanUtil.nextInt("메뉴번호를 입력하세요 : ");
+
+		if (sel == 1) {
+			System.out.println("비밀번호 수정");
+			String pw = ScanUtil.nextLine("현재 비밀번호를 입력하세요 : ");
+			boolean flag = false;
+			if (!flag) {
+				System.out.println("비밀번호를 다시 입력하세요");
+				return View.USER_MYPAGE_EDIT;
+			}
+			String pw1 = ScanUtil.nextLine("변경할 비밀번호를 입력하세요 : ");
+			String pw_re = ScanUtil.nextLine("비밀번호를 한번 더 입력하세요 : ");
+
+		} else if (sel == 2) {
+			String phone = ScanUtil.nextLine("변경할 전화번호를 입력하세요 : ");
+		} else if (sel == 3) {
+			System.out.println("-------------------주소검색");
+			String address = ScanUtil.nextLine("변경할 주소를 입력하세요 : ");
+		}
 
 		System.out.println("돌아가기");
 		return null;
@@ -285,9 +306,9 @@ public class ForestTripView {
 		System.out.println("돌아가기");
 		return null;
 	}
-	
+
 	protected View userQuit() {
-		
+
 		return null;
 	}
 
@@ -301,22 +322,84 @@ public class ForestTripView {
 
 	protected View adminMain() {
 		System.out.println("어드민 메인 페이지입니다.");
-		// 최고관리자일경우
-//		System.out.println("1. 관리자 등록");
-		System.out.println("1. 관리자 목록");
-//		System.out.println("3. 관리자 권한 수정");
-		System.out.println("2. 휴양림 목록");
-//		System.out.println("5. 휴양림 추가");
-//		System.out.println("6. 휴양림 수정");
+		int roll = 0; // 로그인 후 roll 값을 여기다가 초기화
+		if (roll == 1) {
+			// 최고관리자일경우
+			System.out.println("1. 관리자 등록");
+			System.out.println("2. 관리자 목록");
+			System.out.println("3. 관리자 권한 부여/수정");
+			System.out.println("4. 휴양림 목록");
+			System.out.println("5. 휴양림 기본정보 추가");
+			System.out.println("6. 휴양림 세부정보 추가");
+			System.out.println("7. 휴양림 수정");
+			System.out.println("8. 휴양림 통계조회");
 
-		// 도담당자일경우
-		System.out.println("1. 계정 정보 수정");
-		System.out.println("2. 휴양림 목록");
+			int sel = ScanUtil.nextInt("메뉴 번호를 입력하세요 : ");
+			if (sel == 1) {
+				return View.ADMIN_REGISTER;
+			} else if (sel == 2) {
+				return View.ADMIN_LIST;
+			} else if (sel == 3) {
+				return View.ADMIN_REGISTER_ROLL;
+			} else if (sel == 4) {
+				return View.ADMIN_FOREST_LIST;
+			} else if (sel == 5) {
+				return View.ADMIN_FOREST_REGISTER;
+			} else if (sel == 6) {
+				return View.ADMIN_FOREST_DETAIL_REGI;
+			} else if (sel == 7) {
+				return View.ADMIN_FOREST_EDIT;
+			} else if (sel == 8) {
+				return View.ADMIN_STATISTIC;
+			}
+		} else if (roll == 2) {
+			// 도담당자일경우
+			System.out.println("1. 계정 정보 수정");
+			System.out.println("2. 휴양림 목록");
+			System.out.println("3. 휴양림 기본정보 추가");
+			System.out.println("4. 휴양림 세부정보 추가");
+			System.out.println("5. 휴양림 수정");
+			System.out.println("6. 휴양림 통계조회");
 
-		// 휴양림담당자일경우
-		System.out.println("1. 계정 정보 수정");
-		System.out.println("2. 휴양림 목록");
-		return null;
+			int sel = ScanUtil.nextInt("메뉴 번호를 입력하세요 : ");
+			if (sel == 1) {
+				return View.ADMIN_EDIT;
+			} else if (sel == 2) {
+				return View.ADMIN_FOREST_LIST;
+			} else if (sel == 3) {
+				return View.ADMIN_FOREST_REGISTER;
+			} else if(sel==4) {
+				return View.ADMIN_FOREST_DETAIL_REGI;
+			} else if (sel ==5) {
+				return View.ADMIN_FOREST_EDIT;
+			} else if (sel ==6) {
+				return View.ADMIN_STATISTIC;
+			}
+		} else if (roll == 3) {
+			// 휴양림담당자일경우
+			System.out.println("1. 계정 정보 수정");
+			System.out.println("2. 휴양림 목록");
+			System.out.println("3. 휴양림 기본정보 추가");
+			System.out.println("4. 휴양림 세부정보 추가");
+			System.out.println("5. 휴양림 수정");
+			System.out.println("6. 휴양림 통계조회");
+
+			int sel = ScanUtil.nextInt("메뉴 번호를 입력하세요 : ");
+			if (sel == 1) {
+				return View.ADMIN_EDIT;
+			} else if (sel == 2) {
+				return View.ADMIN_FOREST_LIST;
+			}else if (sel==3) {
+				return View.ADMIN_FOREST_REGISTER;
+			}else if(sel==4) {
+				return View.ADMIN_FOREST_DETAIL_REGI;
+			}else if (sel == 5) {
+				return View.ADMIN_FOREST_EDIT;
+			}else if(sel == 6) {
+				return View.ADMIN_STATISTIC;
+			}
+		}
+		return View.ADMIN_MAIN;
 	}
 
 	protected View adminRegister() {
