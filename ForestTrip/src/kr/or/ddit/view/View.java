@@ -17,6 +17,8 @@ public enum View {
 	USER_MYPAGE, // 마이페이지 안에 자기가 갔던 휴양림 목록 출력
 	USER_MYPAGE_EDIT,
 	USER_MYPAGE_FOREST_REVIEW,
+	USER_QUIT,
+	
 	//결제 정보를 입력해야할까말까
 	
 	

@@ -44,6 +44,9 @@ public class ForestTripView {
 			case USER_MYPAGE_FOREST_REVIEW:
 				view = userMyPageForestReview();
 				break;
+			case USER_QUIT:
+				view = userQuit();
+				break;
 			case ADMIN_LOGIN:
 				view = adminLogin();
 				break;
@@ -252,6 +255,14 @@ public class ForestTripView {
 			System.out.println("2. 휴양림 / 숙소 리뷰 작성");
 			System.out.println("3. 회원탈퇴");
 			System.out.println("0. 돌아가기");
+			
+			if(sel == 1) {
+				return View.USER_MYPAGE_EDIT;
+			}else if(sel == 2) {
+				return View.USER_MYPAGE_FOREST_REVIEW;
+			}else if(sel == 3) {
+				
+			}
 		}
 		
 		return null;
@@ -272,6 +283,11 @@ public class ForestTripView {
 		System.out.println("후기 입력");
 
 		System.out.println("돌아가기");
+		return null;
+	}
+	
+	protected View userQuit() {
+		
 		return null;
 	}
 
