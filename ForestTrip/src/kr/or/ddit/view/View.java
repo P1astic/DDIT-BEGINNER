@@ -8,6 +8,7 @@ public enum View {
 	MAIN,
 	
 	//회원이 사용하는 기능
+	USER_HOME,
 	USER_LOGIN, // 유저 로그인 
 	USER_SIGNUP, // 유저 회원가입
 	USER_FIND, // 아이디, 비밀번호 찾기 페이지
