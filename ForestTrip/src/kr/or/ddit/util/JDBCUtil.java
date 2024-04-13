@@ -35,8 +35,8 @@ public class JDBCUtil {
 		return instance;
 	}
 	
-	private String url = "jdbc:oracle:thin:@localhost:1521:xe";
-	private String user = "HJH97";
+	private String url = "jdbc:oracle:thin:@192.168.145.26:1521:xe";
+	private String user = "forest";
 	private String password = "java";
 	
 	private Connection conn = null;

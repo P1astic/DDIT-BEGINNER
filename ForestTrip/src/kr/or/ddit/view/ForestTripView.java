@@ -124,30 +124,33 @@ public class ForestTripView {
 
 	}
 
+	/**
+	 * @return 로그인 로직 구현 완료 24.4.13. 14:54 홍정호
+	 */
 	protected View userLogin() {
-		System.out.println("로그인메뉴");
 		System.out.println("로그인 하기");
+		System.out.println("***'GB'를 입력해 돌아가기***");
 		String user_id = ScanUtil.nextLine("아이디 : ");
-		String user_pw = ScanUtil.nextLine("비밀번호 : ");
-
-		List<Object> param = new ArrayList<Object>();
-		param.add(user_id);
-		param.add(user_pw);
-
-		boolean flag = true;// memberService.login(param);
-		if (!flag) {
-			System.out.println("ID 또는 PW가 일치하지 않습니다.");
+		if (user_id.equals("GB")) {
 			return View.USER_LOGIN;
+		} else {
+			String user_pw = ScanUtil.nextLine("비밀번호 : ");
+			List<Object> param = new ArrayList<Object>();
+			param.add(user_id);
+			param.add(user_pw);
+
+			boolean flag = memberService.userLogin(param);
+			if (!flag) {
+				System.out.println("ID 또는 PW가 일치하지 않습니다.");
+				return View.USER_LOGIN;
+			}
+			return View.USER_HOME;
 		}
-
-		View view = (View) sessionStorage.get("view");
-		if (view == null)
-			return View.MAIN;
-
-		return view;
 	}
 
 	protected View userHome() {
+		Object user_name = sessionStorage.get("mem_id");
+		System.out.println(user_name + "님 환영합니다.");
 		System.out.println("1. 휴양림 검색하기");
 		System.out.println("2. 마이페이지로 가기");
 		System.out.println("3. 로그아웃하기");
@@ -187,27 +190,58 @@ public class ForestTripView {
 
 	protected View userFind() {
 		System.out.println("아이디/비밀번호찾기 페이지입니다.");
+		System.out.println("1. 아이디 찾기");
+		System.out.println("2. 비밀번호 찾기");
+		System.out.println("***'GB'를 입력해 돌아가기***");
 
-		int sel = ScanUtil.nextInt("메뉴번호를 입력하세요 : ");
-		if (sel == 1) {
-			System.out.println("1. 아이디 찾기");
-			String name = ScanUtil.nextLine("성함을 입력하세요 : ");
-			String phone = ScanUtil.nextLine("전화번호를 입력하세요 : ");
-			System.out.println("돌아가기");
-		} else if (sel == 2) {
-			System.out.println("2. 비밀번호 찾기");
-			String id = ScanUtil.nextLine("아이디를 입력하세요 : ");
-			String name = ScanUtil.nextLine("성함을 입력하세요 : ");
-
-			boolean check_flag = false;
-			if (check_flag == true) {
-				String pw = ScanUtil.nextLine("바꿀 비밀번호를 입력하세요 : ");
-				String pw_check = ScanUtil.nextLine("비밀번호 재확인 : ");
-
-				System.out.println("돌아가기");
+		String sel = ScanUtil.nextLine("메뉴번호를 입력하세요 : ");
+		if (sel.charAt(0) - '0' == 1) {
+			String user_name = ScanUtil.nextLine("성함을 입력하세요 : ");
+			String user_phone = ScanUtil.nextLine("'-'기호를 포함해 전화번호를 입력하세요 : ");
+			List<Object> param = new ArrayList<Object>();
+			param.add(user_name);
+			param.add(user_phone);
+			
+			boolean idCheck = memberService.idFind(param);
+			if(idCheck == false) {
+				System.out.println("회원정보와 일치하는 아이디가 없습니다.");
+				return View.USER_FIND;
 			}
+			System.out.println("회원님의 ID는 " + sessionStorage.get("mem_id"));
+			return View.MAIN;
+			
+		} else if (sel.charAt(0) - '0' == 2) {
+			String user_id = ScanUtil.nextLine("아이디를 입력하세요 : ");
+			String user_name = ScanUtil.nextLine("성함을 입력하세요 : ");
+			List<Object> param = new ArrayList<Object>();
+			param.add(user_id);
+			param.add(user_name);
+			
+			List<Object> pw_input = new ArrayList<Object>();
+			pw_input.add(user_id);
+			boolean check_flag = memberService.pwFind(param);
+			while(true) {
+				if (check_flag == true) {
+					String pw = ScanUtil.nextLine("바꿀 비밀번호를 입력하세요 : ");
+		
+					String pw_check = ScanUtil.nextLine("비밀번호 재확인 : ");
+					if(pw.equals(pw_check)) {
+						pw_input.add(pw);
+						memberService.pwUpdate(pw_input);
+						System.out.println("비밀번호가 바뀌었습니다.");
+						return View.MAIN;
+					}else {
+						System.out.println("입력하신 비밀번호가 일치하지 않습니다.");
+						continue;
+					}
+					
+				}
+			}
+
+		} else if (sel.equals("GB")) {
+			return View.MAIN;
 		}
-		return null;
+		return View.USER_HOME;
 	}
 
 	////////////////////
@@ -258,6 +292,8 @@ public class ForestTripView {
 			}
 			String pw1 = ScanUtil.nextLine("변경할 비밀번호를 입력하세요 : ");
 			String pw_re = ScanUtil.nextLine("비밀번호를 한번 더 입력하세요 : ");
+			
+			
 
 		} else if (sel == 2) {
 			String phone = ScanUtil.nextLine("변경할 전화번호를 입력하세요 : ");
