@@ -147,8 +147,7 @@ public class ForestTripView {
 		}
 
 		View view = (View) sessionStorage.get("view");
-		if (view == null)
-			return View.MAIN;
+		if (view == null) return View.MAIN;
 
 		return view;
 	}
@@ -299,17 +298,60 @@ public class ForestTripView {
 	}
 
 	protected View userMyPageForestReview() {
-		System.out.println("마이페이지 휴양림 리뷰작성 페이지");
-		System.out.println("평점 입력");
-		System.out.println("후기 입력");
-
-		System.out.println("돌아가기");
-		return null;
+		//+user의 휴양림 갔다 온 곳 리스트 뽑기
+		String sel = ScanUtil.nextLine("어떤 휴양림의 리뷰를 남기시겠습니까?");
+		//+어떤 휴양림인지에 대한 코딩
+		int sel2 = ScanUtil.nextInt("평점을 입력해주세요(최대5점)");
+		if(sel2<=5||sel2>=0) {
+			System.out.println(sel+"의 평점을"+sel2+"로 남기셨습니다.");
+		}else {
+			System.out.println("잘못입력하셨습니다. 리뷰작성페이지로 돌아갑니다.");
+			return View.USER_MYPAGE_FOREST_REVIEW;
+		}
+		String sel3 = ScanUtil.nextLine(sel+"숙소의 후기를 작성해주십이오.");
+		String sel4 = ScanUtil.nextLine("정말 등록하시겠습니까?(Y/N)(잘못입력시 메인페이지로 돌아갑니다)");
+		if(sel4=="Y"||sel=="y") {
+			System.out.println("후기등록이 다음과 같이 등록되었습니다.");
+			System.out.println(sel+"의 평점 : "+sel2+"\n"+sel+"의 후기 : "+sel3);
+			System.out.println("소중한 리뷰 감사합니다.");
+			return View.USER_HOME;
+		}else if(sel4=="N"||sel4=="n") {
+			System.out.println("리뷰 등록을 취소하였습니다.");
+			return View.USER_MYPAGE_FOREST_REVIEW;
+		}else {
+			System.out.println("리뷰 등록을 취소하였습니다.");
+			return View.USER_HOME;
+		}
 	}
 
 	protected View userQuit() {
+		//사용자 탈퇴기능, 탈퇴하기 페이지 진입시 패스워드 입력, 최종 탈퇴전 정말 탈퇴하시겠습니까? 메시지 출력, y/n y시 탈퇴 n은 메인화면으로
+		System.out.println("회원탈퇴 페이지입니다 패스워드를 입력해주세요");
+		//패스워드입력코드
+		String pw = ScanUtil.nextLine("PW를 입력해주세요");
+		//+sql id pw 동일 시 다음 줄 
+		//+sql id pw 틀릴 시 다시입력하기 or id찾기 or pw찾기 or 유저_홈가기
 
-		return null;
+		String sel = ScanUtil.nextLine("회원 탈퇴를 진행하시겠습니까?(Y/N)");
+		if(sel == "Y"||sel =="y") {
+			String sel2 = ScanUtil.nextLine("정말 회원 탈퇴를 진행하시겠습니까?(Y/N)");
+			if(sel2=="Y"||sel2=="y") {
+				System.out.println("회원탈퇴가 진행이 완료되었습니다.");
+				return View.USER_HOME;
+			}else if(sel2=="N"||sel2=="n") {
+				System.out.println("회원탈퇴 진행을 취소하였습니다.");
+				return View.USER_HOME;
+			}else {
+				System.out.println("잘못 입력하셨습니다. 회원탈퇴 처음페이지로 돌아갑니다.");
+				return View.USER_QUIT;
+			}
+		}else if(sel=="N"||sel=="n") {
+			System.out.println("회원탈퇴 진행을 취소하였습니다.");
+			return View.USER_HOME;
+		}else {
+			System.out.println("잘못 입력하셨습니다.");
+			return View.USER_QUIT;
+		}
 	}
 
 	protected View adminLogin() {
