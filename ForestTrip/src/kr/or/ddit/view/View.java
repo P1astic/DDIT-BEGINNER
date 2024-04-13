@@ -26,6 +26,7 @@ public enum View {
 	// 관리자에는 최고관리자(아이디 부여, 권한부여, 데이터 총괄관리), 도담당자(관할 도 담당), 휴양림 담당자(휴양림 담당)가 있다.
 	ADMIN_LOGIN,
 	ADMIN_MAIN,
+	
 	ADMIN_REGISTER,
 	ADMIN_EDIT,
 	ADMIN_LIST,

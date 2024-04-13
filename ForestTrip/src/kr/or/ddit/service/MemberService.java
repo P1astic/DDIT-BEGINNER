@@ -3,6 +3,7 @@ package kr.or.ddit.service;
 import java.util.List;
 
 import kr.or.ddit.dao.ForestTripDao;
+import kr.or.ddit.vo.memberVo;
 
 public class MemberService {
 	private static MemberService instance;
@@ -24,6 +25,10 @@ public class MemberService {
 		
 		
 		return true;
+	}
+
+	public void userSignUp(List<Object> param) {
+		forestDao.userSignUp(param);
 	}
 
 }

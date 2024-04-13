@@ -11,3 +11,4 @@ public class memberVo {
 	private String mem_addr;
 	private String quit_flag;
 }
+
