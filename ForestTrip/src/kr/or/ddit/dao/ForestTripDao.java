@@ -1,5 +1,7 @@
 package kr.or.ddit.dao;
 
+import java.util.List;
+
 public class ForestTripDao {
 	private static ForestTripDao instance;
 
@@ -12,5 +14,10 @@ public class ForestTripDao {
 			instance = new ForestTripDao();
 		}
 		return instance;
+	}
+	
+	public List<Object> userLogin(List<Object> param){
+		
+		return null;
 	}
 }
