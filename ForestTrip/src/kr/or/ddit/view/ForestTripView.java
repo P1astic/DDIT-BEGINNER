@@ -29,12 +29,6 @@ public class ForestTripView {
 			case USER_FIND:
 				view = userFind();
 				break;
-//			case ID_FIND:
-//				view = idFind();
-//				break;
-//			case PW_FIND:
-//				view = pwFind();
-//				break;
 			case USER_MYPAGE:
 				view = userMyPage();
 				break;
@@ -216,28 +210,6 @@ public class ForestTripView {
 		return null;
 	}
 
-//	protected View idFind() {
-//		System.out.println("아이디 찾기 페이지입니다.");
-//
-//		System.out.println("성함을 입력하세요");
-//		System.out.println("전화번호를 입력하세요");
-//
-//		System.out.println("돌아가기");
-//		return null;
-//	}
-
-//	protected View pwFind() {
-//		System.out.println("비밀번호 찾기 페이지입니다.");
-//
-//		System.out.println("아이디를 입력하세요");
-//		System.out.println("성함을 입력하세요");
-//		System.out.println("바꿀 비밀번호를 입력하세요");
-//		System.out.println("비밀번호 재확인");
-//
-//		System.out.println("돌아가기");
-//		return null;
-//	}
-
 	////////////////////
 	protected View userMyPage() {
 		System.out.println("사용자 마이페이지");
@@ -299,17 +271,61 @@ public class ForestTripView {
 	}
 
 	protected View userMyPageForestReview() {
-		System.out.println("마이페이지 휴양림 리뷰작성 페이지");
-		System.out.println("평점 입력");
-		System.out.println("후기 입력");
-
-		System.out.println("돌아가기");
-		return null;
+		// +user의 휴양림 갔다 온 곳 리스트 뽑기
+		String sel = ScanUtil.nextLine("어떤 휴양림의 리뷰를 남기시겠습니까?");
+		// +어떤 휴양림인지에 대한 코딩
+		int sel2 = ScanUtil.nextInt("평점을 입력해주세요(최대5점)");
+		if (sel2 <= 5 || sel2 >= 0) {
+			System.out.println(sel + "의 평점을" + sel2 + "로 남기셨습니다.");
+		} else {
+			System.out.println("잘못입력하셨습니다. 리뷰작성페이지로 돌아갑니다.");
+			return View.USER_MYPAGE_FOREST_REVIEW;
+		}
+		String sel3 = ScanUtil.nextLine(sel + "숙소의 후기를 작성해주십이오.");
+		String sel4 = ScanUtil.nextLine("정말 등록하시겠습니까?(Y/N)(잘못입력시 메인페이지로 돌아갑니다)");
+		if (sel4 == "Y" || sel == "y") {
+			System.out.println("후기등록이 다음과 같이 등록되었습니다.");
+			System.out.println(sel + "의 평점 : " + sel2 + "\n" + sel + "의 후기 : " + sel3);
+			System.out.println("소중한 리뷰 감사합니다.");
+			return View.USER_HOME;
+		} else if (sel4 == "N" || sel4 == "n") {
+			System.out.println("리뷰 등록을 취소하였습니다.");
+			return View.USER_MYPAGE_FOREST_REVIEW;
+		} else {
+			System.out.println("리뷰 등록을 취소하였습니다.");
+			return View.USER_HOME;
+		}
 	}
 
 	protected View userQuit() {
+		// 사용자 탈퇴기능, 탈퇴하기 페이지 진입시 패스워드 입력, 최종 탈퇴전 정말 탈퇴하시겠습니까? 메시지 출력, y/n y시 탈퇴 n은
+		// 메인화면으로
+		System.out.println("회원탈퇴 페이지입니다 패스워드를 입력해주세요");
+		// 패스워드입력코드
+		String pw = ScanUtil.nextLine("PW를 입력해주세요");
+		// +sql id pw 동일 시 다음 줄
+		// +sql id pw 틀릴 시 다시입력하기 or id찾기 or pw찾기 or 유저_홈가기
 
-		return null;
+		String sel = ScanUtil.nextLine("회원 탈퇴를 진행하시겠습니까?(Y/N)");
+		if (sel == "Y" || sel == "y") {
+			String sel2 = ScanUtil.nextLine("정말 회원 탈퇴를 진행하시겠습니까?(Y/N)");
+			if (sel2 == "Y" || sel2 == "y") {
+				System.out.println("회원탈퇴가 진행이 완료되었습니다.");
+				return View.USER_HOME;
+			} else if (sel2 == "N" || sel2 == "n") {
+				System.out.println("회원탈퇴 진행을 취소하였습니다.");
+				return View.USER_HOME;
+			} else {
+				System.out.println("잘못 입력하셨습니다. 회원탈퇴 처음페이지로 돌아갑니다.");
+				return View.USER_QUIT;
+			}
+		} else if (sel == "N" || sel == "n") {
+			System.out.println("회원탈퇴 진행을 취소하였습니다.");
+			return View.USER_HOME;
+		} else {
+			System.out.println("잘못 입력하셨습니다.");
+			return View.USER_QUIT;
+		}
 	}
 
 	protected View adminLogin() {
@@ -368,11 +384,11 @@ public class ForestTripView {
 				return View.ADMIN_FOREST_LIST;
 			} else if (sel == 3) {
 				return View.ADMIN_FOREST_REGISTER;
-			} else if(sel==4) {
+			} else if (sel == 4) {
 				return View.ADMIN_FOREST_DETAIL_REGI;
-			} else if (sel ==5) {
+			} else if (sel == 5) {
 				return View.ADMIN_FOREST_EDIT;
-			} else if (sel ==6) {
+			} else if (sel == 6) {
 				return View.ADMIN_STATISTIC;
 			}
 		} else if (roll == 3) {
@@ -389,13 +405,13 @@ public class ForestTripView {
 				return View.ADMIN_EDIT;
 			} else if (sel == 2) {
 				return View.ADMIN_FOREST_LIST;
-			}else if (sel==3) {
+			} else if (sel == 3) {
 				return View.ADMIN_FOREST_REGISTER;
-			}else if(sel==4) {
+			} else if (sel == 4) {
 				return View.ADMIN_FOREST_DETAIL_REGI;
-			}else if (sel == 5) {
+			} else if (sel == 5) {
 				return View.ADMIN_FOREST_EDIT;
-			}else if(sel == 6) {
+			} else if (sel == 6) {
 				return View.ADMIN_STATISTIC;
 			}
 		}
@@ -404,9 +420,9 @@ public class ForestTripView {
 
 	protected View adminRegister() {
 		System.out.println("어드민 등록 페이지");
-		System.out.println("등록할 어드민 아이디 입력 : ");
-		System.out.println("등록할 어드민 비밀번호 입력 : ");
-		System.out.println("비밀번호 확인 : ");
+		String id = ScanUtil.nextLine("등록할 어드민 아이디 입력 : ");
+		String pw = ScanUtil.nextLine("등록할 어드민 비밀번호 입력 : ");
+		String pw_re = ScanUtil.nextLine("비밀번호 확인 : ");
 
 		System.out.println("돌아가기");
 
@@ -414,12 +430,34 @@ public class ForestTripView {
 	}
 
 	protected View adminEdit() {
-		System.out.println("어드민 정보 수정 페이지");
-		System.out.println("0을 입력해 돌아가기");
-		System.out.println("1. 비밀번호, 사용자명 등 일반정보 수정");
-		System.out.println("2. 권한 수정 / 권한 수정은 최고 관리자만 보이게");
 
-		System.out.println("돌아가기");
+		int roll = 0; // 권한 가져와야함
+
+		if (roll != 0) {
+			System.out.println("어드민 정보 수정 페이지");
+			System.out.println("0을 입력해 돌아가기");
+			System.out.println("1. 비밀번호 수정");
+			int sel = ScanUtil.nextInt("메뉴 번호를 입력하세요 : ");
+			if (sel == 1) {
+				String pw = ScanUtil.nextLine("수정할 비밀번호를 입력하세요.");
+				String pw_re = ScanUtil.nextLine("비밀번호 확인 : ");
+			} else if (sel == 0) {
+				System.out.println("돌아가기");
+
+			}
+		} else {
+			int sel = ScanUtil.nextInt("메뉴 번호를 입력하세요 : ");
+			if (sel == 1) {
+				String pw = ScanUtil.nextLine("수정할 비밀번호를 입력하세요.");
+				String pw_re = ScanUtil.nextLine("비밀번호 확인 : ");
+			} else if (sel == 0) {
+				System.out.println("돌아가기");
+
+			} else if (sel == 2) {
+				return View.ADMIN_REGISTER_ROLL;
+			}
+		}
+
 		return null;
 	}
 
@@ -427,7 +465,10 @@ public class ForestTripView {
 		System.out.println("최고관리자의 관리자 정보 수정을 위한 목록 페이지");
 
 		System.out.println("모든 어드민 목록 출력(출력시에는 모든 정보가 포함되어 나오게");
+		// sql selectList
+
 		System.out.println("목록 번호를 눌러 수정 페이지로 넘어가기");
+		// sql selectone then adminEdit()
 
 		System.out.println("돌아가기");
 		return null;
@@ -453,10 +494,19 @@ public class ForestTripView {
 	}
 
 	protected View adminForestList() {
+
+		int roll = 0;
+		// sql로 로그인 한 계정의 roll 가져오기
+
 		System.out.println("어드민의 휴양림 목록 출력 페이지");
+		// sql selectList
 
 		System.out.println("어드민 계정이 도담당자일경우 도 단위의 목록 출력");
+		// sql selectList
+
 		System.out.println("어드민 계정이 휴양림담당자일경우 해당 휴양림만 출력");
+
+		// sql selectList
 
 		System.out.println("수정할 휴양림의 목록번호를 입력");
 
@@ -466,40 +516,45 @@ public class ForestTripView {
 	protected View adminForestRegister() {
 
 		System.out.println("어드민의 휴양림 등록");
-		System.out.println("1. 휴양림명 등록");
-		System.out.println("2. 기본주소(시도, 시군)는 자동 입력");
-		System.out.println("3. 주소 검색 후 상세주소 입력");
-		System.out.println("4. 객실 등록");
-		System.out.println("5. 최대 이용인원 등록");
-		System.out.println("6. 이용료 등록");
+		String forest_name = ScanUtil.nextLine("1. 휴양림명 등록");
+//		String forest_addr_base = ("2. 기본주소(시도, 시군)는 자동 입력");
+		// sql을 통해 관리자 계정의 시도 시군 스트링 값 가지고 오기
 
-		return null;
+		String forest_addr_detail = ScanUtil.nextLine("3. 주소 검색 후 상세주소 입력");
+		String room_name = ScanUtil.nextLine("4. 객실 명을 입력하세요. 추가 객실은 상세 정보에서 등록이 가능합니다.");
+		int room_qty = ScanUtil.nextInt("5. 최대 이용인원 등록 : ");
+
+		return View.ADMIN_MAIN;
 	}
 
 	protected View adminForestEdit() {
 		System.out.println("어드민의 휴양림 정보 수정");
 
 		System.out.println("목록에서 선택 후 상세 정보로 이동");
+		// sql selectList, 상세정보는 객실명, 수용인원, 공지사항
 		System.out.println("상세 정보에는 최초로 등록한 모든 정보가 출력되고 사용자는" + "컬럼을 선택해서 그 정보를 수정");
+		int num = ScanUtil.nextInt("컬럼 번호를 입력하세요.");
+		// pagination 구현 필요
 
 		System.out.println("수정 시 경고문");
 		System.out.println("예시) 정보를 바꿀 시 사용자가 이를 모를 수도 있다~~ 이런식으로");
 
 		System.out.println("돌아가기");
 
-		return null;
+		return View.ADMIN_MAIN;
 
 	}
 
 	protected View adminForestDetailRegi() {
 		System.out.println("휴양림 상세정보 등록(휴양림 목록 페이지에서 접근)");
-		System.out.println("주의사항, 공지사항 작성");
 
-		System.out.println("공지사항 입력: ");
+		System.out.println("객실 추가등록(객실명, 수용인원), 공지사항 작성");// 공지사항은 객실에 종속 또는 휴양림 공지사항
 
-		System.out.println("주의사항 입력: ");
+		String room_name = ScanUtil.nextLine("객실명을 입력하세요 : ");
+		int room_qty = ScanUtil.nextInt("수용인원을 입력하세요 : ");
+		String room_notice = ScanUtil.nextLine("객실 공지사항을 작성하세요 : ");
 
-		return null;
+		return View.ADMIN_MAIN;
 	}
 
 	protected View adminStatistic() {
@@ -520,6 +575,12 @@ public class ForestTripView {
 		// 사용자 휴양림 검색 페이지
 		System.out.println("휴양림 검색 페이지, 비회원도 가능 단 예약시에는 회원만 가능");
 		System.out.println("검색 조건 : 1.도 입력   2.시(군)입력  3.날짜선택  4.인원입력 ");
+		// 도 목록 보여주기 json 또는 생성자
+		// 시군 목록 보여주기 json 또는 생성자
+		// 날짜는 현재날짜 기준으로
+		int qty = ScanUtil.nextInt("인원을 입력해주세요 : ");
+
+		// 날짜 선택 시 달력만들기
 		System.out.println("*******프로젝트 진행 속도에 따라 사용자는 1박만 하게 해야 할 수 있음*******");
 
 		return null;
@@ -529,6 +590,8 @@ public class ForestTripView {
 		// 사용자 휴양림 목록 페이지
 		System.out.println("forestSearch 조건에 부합하는 휴양림 목록 출력");
 		System.out.println("사용자는 목록에서 번호 입력해서 상세 정보 조회 페이지로 이동");
+		int row = ScanUtil.nextInt("목록 번호를 입력하세요 : ");
+		// pagination 필요
 
 		System.out.println("돌아가기");
 		return null;
