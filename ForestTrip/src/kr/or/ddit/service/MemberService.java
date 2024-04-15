@@ -88,4 +88,10 @@ public class MemberService {
 		return true;
 	}
 
+	public void userSignUp(List<Object> param) {
+		forestDao.userSignUp(param);
+	}
+	
+	
+
 }

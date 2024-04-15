@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import kr.or.ddit.service.ForestTripService;
 import kr.or.ddit.service.MemberService;
@@ -170,25 +171,95 @@ public class ForestTripView {
 	}
 
 	protected View signUp() {
+
 		// 값 입력 체크 알고리즘 필요
-
-		System.out.println("회원가입 페이지입니다.");
-
-		String user_id = ScanUtil.nextLine("아이디를 입력하세요 : ");
-		String user_pw = ScanUtil.nextLine("PW를 입력하세요 : ");
-		String user_pw_check = ScanUtil.nextLine("PW를  재입력하세요 : ");
-
-		String user_name = ScanUtil.nextLine("이름을 입력하세요 : ");
-		String user_phone = ScanUtil.nextLine("휴대폰 번호를 입력하세요 : ");
-
+		Scanner scanner = new Scanner(System.in);
+		List<Object> param = new ArrayList<Object>();
+		System.out.println("회원가입을 시작합니다.");
+		
+        System.out.println("이름을 입력하세요 : ");
+        String user_name = scanner.nextLine();
+		System.out.println("ID를 입력하세요 : ");
+        // 아이디 입력 및 중복 검사
+        String user_id;
+        do {
+            System.out.print("아이디를 입력하세요: ");
+            user_id = scanner.nextLine();
+            if (!isUsernameValid(user_id)) {
+                System.out.println("아이디는 5자 이상 15자 미만의 영문과 숫자의 조합이어야 합니다.");
+            }
+        } while (!isUsernameValid(user_id) || isUsernameDuplicate(user_id));
+		
+		System.out.println("PW를 입력하세요.");
+		String user_pw;
+	     // 비밀번호 입력 및 검사
+        do {
+            System.out.print("비밀번호를 입력하세요: ");
+            user_pw = scanner.nextLine();
+            if (!isPasswordValid(user_pw)) {
+                System.out.println("비밀번호는 5자 이상 15자 미만의 영문, 숫자, 특수기호의 조합이어야 합니다.");
+            }
+        } while (!isPasswordValid(user_pw));
+        
+        // 이메일 입력 및 유효성 검사
+        String user_email;
+        do {
+            System.out.print("이메일을 입력하세요: ");
+            user_email = scanner.nextLine();
+            if (!isEmailValid(user_email)) {
+                System.out.println("유효하지 않은 이메일 형식입니다. 다시 입력해주세요.");
+            }
+        } while (!isEmailValid(user_email));
+        
+        // 전화번호 입력 및 형식 검사
+        System.out.print("전화번호를 입력하세요 (ex. 010-1234-5678): ");
+        String user_phone = scanner.nextLine();
+        if (!isPhoneNumberValid(user_phone)) {
+            System.out.println("유효하지 않은 전화번호 형식입니다.");
+            // 전화번호 형식이 잘못되었을 경우, 원하는 방법으로 처리할 수 있습니다.
+        }
+        
+        param.add(user_id);
+        param.add(user_pw);
+        param.add(user_name);
+        param.add(user_email);
+        param.add(user_phone);
+        
+        
 		// 주소 검색 알고리즘 필요
 		System.out.println("---------------주소 검색 : ");
 
 		// 돌아가기 알고리즘 필요
 		System.out.println("돌아가기");
 
+		//회원가입 주소 검색 및 mem_no 시퀀스 구현 필요 - 홍정호 24.4.13.17:26
+		
+		memberService.userSignUp(param);
 		return null;
 	}
+    // 아이디 유효성 검사 메서드
+    public static boolean isUsernameValid(String user_name) {
+        return user_name.matches("^[a-zA-Z](?=.*[a-zA-Z])(?=.*\\\\d)[a-zA-Z\\\\d]{5,15}$");
+    }
+    // 아이디 중복 검사 메서드 (가정)
+    public static boolean isUsernameDuplicate(String user_name) {
+        // 여기에 중복 검사하는 코드를 추가하세요. - 김동오 24.4.13.17:26
+        // 실제로는 데이터베이스에서 아이디를 검색하여 중복을 확인할 수 있습니다.
+    	
+        return false; // 가정상 중복이 없다고 가정
+    }
+    // 비밀번호 유효성 검사 메서드
+    public static boolean isPasswordValid(String user_pw) {
+        return user_pw.matches("^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{5,15}$");
+    }
+    // 이메일 유효성 검사 메서드
+    public static boolean isEmailValid(String user_email) {
+        return user_email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+    // 전화번호 형식 검사 메서드
+    public static boolean isPhoneNumberValid(String user_phone) {
+        return user_phone.matches("^\\d{3}-\\d{3,4}-\\d{4}$");
+    }
 
 	protected View userFind() {
 		System.out.println("아이디/비밀번호찾기 페이지입니다.");
