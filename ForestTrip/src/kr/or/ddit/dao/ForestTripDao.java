@@ -77,4 +77,11 @@ public class ForestTripDao {
 		
 		return jdbc.selectOne(sql, param, AdminVo.class);
 	}
+
+	public void userSignUp(List<Object> param) {
+		
+		String sql="";
+		
+		jdbc.update(sql,param);
+	}
 }
