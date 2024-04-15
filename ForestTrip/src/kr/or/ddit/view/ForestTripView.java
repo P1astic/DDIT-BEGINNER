@@ -316,7 +316,7 @@ public class ForestTripView {
 	}
 
 	/**
-	 * @return 마이페이지 접근 기능 구현 완료 24.4.15.홍정호 09:23
+	 * @return 마이페이지 접근 기능 구현 완료 24.4.15.홍정호 09:23 test
 	 */
 	protected View userMyPage() {
 		System.out.println("사용자 마이페이지");
