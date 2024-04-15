@@ -130,7 +130,7 @@ public class ForestTripView {
 	/**
 	 * @return 로그인 로직 구현 완료 24.4.13. 14:54 홍정호
 	 */
-	protected View userLogin() {
+	protected View userLogin() {//1
 		System.out.println("로그인 하기");
 		System.out.println("***'GB'를 입력해 돌아가기***");
 		String user_id = ScanUtil.nextLine("아이디 : ");
