@@ -318,7 +318,7 @@ public class ForestTripView {
 	/**
 	 * @return 마이페이지 접근 기능 구현 완료 24.4.15.홍정호 09:23 test
 	 */
-	protected View userMyPage() {
+	protected View userMyPage() {//1
 		System.out.println("사용자 마이페이지");
 		String pw = ScanUtil.nextLine("마이페이지에 들어가기 위해 비밀번호를 입력하세요 : ");
 		List<Object> param = new ArrayList<Object>();
