@@ -1,6 +1,7 @@
 package kr.or.ddit.service;
 
 import java.util.List;
+import java.util.Map;
 
 import kr.or.ddit.dao.ForestTripDao;
 import kr.or.ddit.view.ForestTripView;
@@ -27,7 +28,7 @@ public class MemberService {
 		if (loginCheck == null) {
 			return false;
 		}
-
+ 
 		ForestTripView.sessionStorage.put("mem_id", loginCheck.getMem_id());
 		ForestTripView.sessionStorage.put("mem_name", loginCheck.getMem_name());
 		ForestTripView.sessionStorage.put("mem_addr", loginCheck.getMem_addr());
@@ -57,6 +58,9 @@ public class MemberService {
 	public void pwUpdate(List<Object> param) {
 		forestDao.pwUpdate(param);
 
+	}
+	public void adminPWUpdate(List<Object> param) {
+		forestDao.adminPWUpdate(param);
 	}
 
 	public boolean myPage(List<Object> param) {
@@ -92,6 +96,13 @@ public class MemberService {
 		forestDao.userSignUp(param);
 	}
 	
+	public void adminSignUp(List<Object> param) {
+		forestDao.adminSignUp(param);
+	}
+	
+	public List<Map<String, Object>> adminList(List<Object> param) {
+		return forestDao.adminList(param);
+	}
 	
 
 }

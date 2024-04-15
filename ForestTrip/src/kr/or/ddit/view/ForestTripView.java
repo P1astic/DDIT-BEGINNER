@@ -1,14 +1,17 @@
 package kr.or.ddit.view;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import kr.or.ddit.controller.EgovController;
 import kr.or.ddit.service.ForestTripService;
 import kr.or.ddit.service.MemberService;
 import kr.or.ddit.util.ScanUtil;
+import kr.or.ddit.vo.CodeVo;
 
 public class ForestTripView {
 
@@ -57,9 +60,6 @@ public class ForestTripView {
 			case ADMIN_LIST:
 				view = adminList();
 				break;
-			case ADMIN_REGISTER_ROLL:
-				view = adminRegisterRoll();
-				break;
 			case ADMIN_FOREST_LIST:
 				view = adminForestList();
 				break;
@@ -87,6 +87,9 @@ public class ForestTripView {
 			case FOREST_LIST:
 				view = forestList();
 				break;
+			case ADDR_SEARCH:
+				view = addrSearch();
+				break;
 			default:
 				break;
 			}
@@ -96,6 +99,10 @@ public class ForestTripView {
 	static public Map<String, Object> sessionStorage = new HashMap<>();
 	ForestTripService forestService = ForestTripService.getInstance();
 	MemberService memberService = MemberService.getInstance();
+	EgovController egovcontroller = EgovController.getInstance();
+	
+	
+	int index = 1;
 
 	// 돌아가기와 0을 눌러 돌아가기는 다른 기능
 
@@ -124,7 +131,6 @@ public class ForestTripView {
 		default:
 			return View.MAIN;
 		}
-
 	}
 
 	/**
@@ -176,93 +182,98 @@ public class ForestTripView {
 		Scanner scanner = new Scanner(System.in);
 		List<Object> param = new ArrayList<Object>();
 		System.out.println("회원가입을 시작합니다.");
-		
-        System.out.println("이름을 입력하세요 : ");
-        String user_name = scanner.nextLine();
+
+		System.out.println("이름을 입력하세요 : ");
+		String user_name = scanner.nextLine();
 		System.out.println("ID를 입력하세요 : ");
-        // 아이디 입력 및 중복 검사
-        String user_id;
-        do {
-            System.out.print("아이디를 입력하세요: ");
-            user_id = scanner.nextLine();
-            if (!isUsernameValid(user_id)) {
-                System.out.println("아이디는 5자 이상 15자 미만의 영문과 숫자의 조합이어야 합니다.");
-            }
-        } while (!isUsernameValid(user_id) || isUsernameDuplicate(user_id));
-		
+		// 아이디 입력 및 중복 검사
+		String user_id;
+		do {
+			System.out.print("아이디를 입력하세요: ");
+			user_id = scanner.nextLine();
+			if (!isUsernameValid(user_id)) {
+				System.out.println("아이디는 5자 이상 15자 미만의 영문과 숫자의 조합이어야 합니다.");
+			}
+		} while (!isUsernameValid(user_id) || isUsernameDuplicate(user_id));
+
 		System.out.println("PW를 입력하세요.");
 		String user_pw;
-	     // 비밀번호 입력 및 검사
-        do {
-            System.out.print("비밀번호를 입력하세요: ");
-            user_pw = scanner.nextLine();
-            if (!isPasswordValid(user_pw)) {
-                System.out.println("비밀번호는 5자 이상 15자 미만의 영문, 숫자, 특수기호의 조합이어야 합니다.");
-            }
-        } while (!isPasswordValid(user_pw));
-        
-        // 이메일 입력 및 유효성 검사
-        String user_email;
-        do {
-            System.out.print("이메일을 입력하세요: ");
-            user_email = scanner.nextLine();
-            if (!isEmailValid(user_email)) {
-                System.out.println("유효하지 않은 이메일 형식입니다. 다시 입력해주세요.");
-            }
-        } while (!isEmailValid(user_email));
-        
-        // 전화번호 입력 및 형식 검사
-        System.out.print("전화번호를 입력하세요 (ex. 010-1234-5678): ");
-        String user_phone = scanner.nextLine();
-        if (!isPhoneNumberValid(user_phone)) {
-            System.out.println("유효하지 않은 전화번호 형식입니다.");
-            // 전화번호 형식이 잘못되었을 경우, 원하는 방법으로 처리할 수 있습니다.
-        }
-        
-        param.add(user_id);
-        param.add(user_pw);
-        param.add(user_name);
-        param.add(user_email);
-        param.add(user_phone);
-        
-        
+		// 비밀번호 입력 및 검사
+		do {
+			System.out.print("비밀번호를 입력하세요: ");
+			user_pw = scanner.nextLine();
+			if (!isPasswordValid(user_pw)) {
+				System.out.println("비밀번호는 5자 이상 15자 미만의 영문, 숫자, 특수기호의 조합이어야 합니다.");
+			}
+		} while (!isPasswordValid(user_pw));
+
+		// 이메일 입력 및 유효성 검사
+		String user_email;
+		do {
+			System.out.print("이메일을 입력하세요: ");
+			user_email = scanner.nextLine();
+			if (!isEmailValid(user_email)) {
+				System.out.println("유효하지 않은 이메일 형식입니다. 다시 입력해주세요.");
+			}
+		} while (!isEmailValid(user_email));
+
+		// 전화번호 입력 및 형식 검사
+		System.out.print("전화번호를 입력하세요 (ex. 010-1234-5678): ");
+		String user_phone = scanner.nextLine();
+		if (!isPhoneNumberValid(user_phone)) {
+			System.out.println("유효하지 않은 전화번호 형식입니다.");
+			// 전화번호 형식이 잘못되었을 경우, 원하는 방법으로 처리할 수 있습니다.
+		}
+
+		param.add(user_id);
+		param.add(user_pw);
+		param.add(user_name);
+		param.add(user_email);
+		param.add(user_phone);
+
 		// 주소 검색 알고리즘 필요
 		System.out.println("---------------주소 검색 : ");
 
 		// 돌아가기 알고리즘 필요
 		System.out.println("돌아가기");
 
-		//회원가입 주소 검색 및 mem_no 시퀀스 구현 필요 - 홍정호 24.4.13.17:26
-		
+		// 회원가입 주소 검색 및 mem_no 시퀀스 구현 필요 - 홍정호 24.4.13.17:26
+
 		memberService.userSignUp(param);
 		return null;
 	}
-    // 아이디 유효성 검사 메서드
-    public static boolean isUsernameValid(String user_name) {
-        return user_name.matches("^[a-zA-Z](?=.*[a-zA-Z])(?=.*\\\\d)[a-zA-Z\\\\d]{5,15}$");
-    }
-    // 아이디 중복 검사 메서드 (가정)
-    public static boolean isUsernameDuplicate(String user_name) {
-        // 여기에 중복 검사하는 코드를 추가하세요. - 김동오 24.4.13.17:26
-        // 실제로는 데이터베이스에서 아이디를 검색하여 중복을 확인할 수 있습니다.
-    	
-        return false; // 가정상 중복이 없다고 가정
-    }
-    // 비밀번호 유효성 검사 메서드
-    public static boolean isPasswordValid(String user_pw) {
-        return user_pw.matches("^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{5,15}$");
-    }
-    // 이메일 유효성 검사 메서드
-    public static boolean isEmailValid(String user_email) {
-        return user_email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
-    }
-    // 전화번호 형식 검사 메서드
-    public static boolean isPhoneNumberValid(String user_phone) {
-        return user_phone.matches("^\\d{3}-\\d{3,4}-\\d{4}$");
-    }
+
+	// 아이디 유효성 검사 메서드
+	public static boolean isUsernameValid(String user_name) {
+		return user_name.matches("^[a-zA-Z](?=.*[a-zA-Z])(?=.*\\\\d)[a-zA-Z\\\\d]{5,15}$");
+	}
+
+	// 아이디 중복 검사 메서드 (가정)
+	public static boolean isUsernameDuplicate(String user_name) {
+		// 여기에 중복 검사하는 코드를 추가하세요. - 김동오 24.4.13.17:26
+		// 실제로는 데이터베이스에서 아이디를 검색하여 중복을 확인할 수 있습니다.
+
+		return false; // 가정상 중복이 없다고 가정
+	}
+
+	// 비밀번호 유효성 검사 메서드
+	public static boolean isPasswordValid(String user_pw) {
+		return user_pw.matches("^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{5,15}$");
+	}
+
+	// 이메일 유효성 검사 메서드
+	public static boolean isEmailValid(String user_email) {
+		return user_email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+	}
+
+	// 전화번호 형식 검사 메서드
+	public static boolean isPhoneNumberValid(String user_phone) {
+		return user_phone.matches("^\\d{3}-\\d{3,4}-\\d{4}$");
+	}
 
 	protected View userFind() {
 		System.out.println("아이디/비밀번호찾기 페이지입니다.");
+		
 		System.out.println("1. 아이디 찾기");
 		System.out.println("2. 비밀번호 찾기");
 		System.out.println("***'GB'를 입력해 돌아가기***");
@@ -318,7 +329,7 @@ public class ForestTripView {
 	/**
 	 * @return 마이페이지 접근 기능 구현 완료 24.4.15.홍정호 09:23 test
 	 */
-	protected View userMyPage() {//1
+	protected View userMyPage() {// 1
 		System.out.println("사용자 마이페이지");
 		String pw = ScanUtil.nextLine("마이페이지에 들어가기 위해 비밀번호를 입력하세요 : ");
 		List<Object> param = new ArrayList<Object>();
@@ -482,7 +493,6 @@ public class ForestTripView {
 			System.out.println("최고관리자");
 			System.out.println("1. 관리자 등록");
 			System.out.println("2. 관리자 목록");
-			System.out.println("3. 관리자 권한 부여/수정");
 			System.out.println("4. 휴양림 목록");
 			System.out.println("5. 휴양림 기본정보 추가");
 			System.out.println("6. 휴양림 세부정보 추가");
@@ -495,7 +505,7 @@ public class ForestTripView {
 			} else if (sel == 2) {
 				return View.ADMIN_LIST;
 			} else if (sel == 3) {
-				return View.ADMIN_REGISTER_ROLL;
+//				return View.ADMIN_REGISTER_ROLL;
 			} else if (sel == 4) {
 				return View.ADMIN_FOREST_LIST;
 			} else if (sel == 5) {
@@ -556,112 +566,300 @@ public class ForestTripView {
 		return View.ADMIN_MAIN;
 	}
 
+	/**
+	 * @return 관리자 등록 기능 수정완료 - 홍정호 4.15. 18:50
+	 */
 	protected View adminRegister() {
 		System.out.println("어드민 등록 페이지");
 		List<Object> input = new ArrayList<Object>();
 		System.out.println("생성하려는 관리자의 권한은 어떻게 되십니까?");
 		System.out.println("1. 최고관리자, 2. 도담당자, 3. 휴양림담당자");
 		int roll = ScanUtil.nextInt("생성하려는 관리자의 권한은 어떻게 되십니까?");
-
 		if (roll == 1) {
-
+			int code = 9999999;
 			String id = ScanUtil.nextLine("등록할 어드민 아이디 입력 : ");
 			String pw = ScanUtil.nextLine("등록할 어드민 비밀번호 입력 : ");
 			String pw_re = ScanUtil.nextLine("비밀번호 확인 : ");
 			if (pw.equals(pw_re)) {
+				input.add(code);
 				input.add(id);
 				input.add(pw);
+				input.add(roll);
+				return View.ADMIN_MAIN;
 			} else {
 				System.out.println("입력하신 비밀번호가 일치하지 않습니다.");
 				return View.ADMIN_REGISTER;
 			}
 		} else if (roll == 2) {
-			String id = ScanUtil.nextLine("등록할 어드민 아이디 입력 : ");
-			String pw = ScanUtil.nextLine("등록할 어드민 비밀번호 입력 : ");
-			String pw_re = ScanUtil.nextLine("비밀번호 확인 : ");
-			if (pw.equals(pw_re)) {
-				input.add(id);
-				input.add(pw);
-			} else {
-				System.out.println("입력하신 비밀번호가 일치하지 않습니다.");
-				return View.ADMIN_REGISTER;
+			int cut = 0;
+			int start = 0;
+			int end = 0;
+			int index = 1;
+			int count = 0;
+			List<Map<String, Object>> sidoCode = new ArrayList<>();
+			while (true) {
+				System.out.println("지역코드(시도) 불러오기");
+				int pageNo = 1;
+				if (sessionStorage.containsKey("pageNo")) {
+					pageNo = (int) sessionStorage.remove("pageNo");
+				}
+				cut = 5;
+				start = 1 + (pageNo - 1) * cut;
+				end = pageNo * cut;
+
+				List<Object> page = new ArrayList<Object>();
+				page.add(start);
+				page.add(end);
+
+				sidoCode = forestService.sidoList(page);
+
+				if (sidoCode != null && !sidoCode.isEmpty()) {
+					for (Map<String, Object> codeVo : sidoCode) {
+						System.out.println(index++ + "번 행 " + codeVo);
+					}
+				}
+				System.out.println("<이전페이지\t\t다음페이지>");
+				String num = ScanUtil.nextLine("행 번호를 입력하세요 : "); // num-1
+
+				if (num.charAt(0) == '<') {
+					if (pageNo > 1) {
+						sessionStorage.put("pageNo", --pageNo);
+						start -= 10;
+						end -= 10;
+						index -= 10;
+						count -= 5;
+						continue;
+					}else {
+						continue;
+					}
+				} else if (num.charAt(0) == '>') {
+					if (end > index) {
+						System.out.println("마지막페이지입니다.");
+						sessionStorage.put("pageNo", pageNo);
+						continue;
+					}
+					sessionStorage.put("pageNo", ++pageNo);
+					count += 5;
+					continue;
+				} else {
+					BigDecimal code = (BigDecimal) sidoCode.get(Integer.parseInt(num) - 1 - count).get("CODE");
+					System.out.println(code);
+					String id = ScanUtil.nextLine("등록할 어드민 아이디 입력 : ");
+					String pw = ScanUtil.nextLine("등록할 어드민 비밀번호 입력 : ");
+					String pw_re = ScanUtil.nextLine("비밀번호 확인 : ");
+					if (pw.equals(pw_re)) {
+						input.add(code);
+						input.add(id);
+						input.add(pw);
+						input.add(roll);
+						memberService.adminSignUp(input);
+						System.out.println("등록되었습니다.");
+						return View.ADMIN_MAIN;
+					} else {
+						System.out.println("입력하신 비밀번호가 일치하지 않습니다.");
+						return View.ADMIN_REGISTER;
+					}
+				}
 			}
+
 		} else if (roll == 3) {
-			String id = ScanUtil.nextLine("등록할 어드민 아이디 입력 : ");
-			String pw = ScanUtil.nextLine("등록할 어드민 비밀번호 입력 : ");
-			String pw_re = ScanUtil.nextLine("비밀번호 확인 : ");
-			if (pw.equals(pw_re)) {
-				input.add(id);
-				input.add(pw);
-			} else {
-				System.out.println("입력하신 비밀번호가 일치하지 않습니다.");
-				return View.ADMIN_REGISTER;
+			int cut = 0;
+			int start = 0;
+			int end = 0;
+			int index = 1;
+			int count = 0;
+			List<Map<String, Object>> sigunCode = new ArrayList<>();
+			while (true) {
+				System.out.println("지역코드(시군)불러오기");
+				int pageNo = 1;
+				if (sessionStorage.containsKey("pageNo")) {
+					pageNo = (int) sessionStorage.remove("pageNo");
+				}
+				cut = 15;
+				start = 1 + (pageNo - 1) * cut;
+				end = pageNo * cut;
+
+				List<Object> page = new ArrayList<Object>();
+				page.add(start);
+				page.add(end);
+
+				sigunCode = forestService.sigunList(page);
+
+				if (sigunCode != null && !sigunCode.isEmpty()) {
+					for (Map<String, Object> codeVo : sigunCode) {
+						System.out.println(index++ + "번 행 " + codeVo);
+					}
+				}
+
+				System.out.println("<이전페이지\t\t다음페이지>");
+				String num = ScanUtil.nextLine("행 번호를 입력하세요 : "); // num-1
+
+				if (num.charAt(0) == '<') {
+					if (pageNo > 1) {
+						sessionStorage.put("pageNo", --pageNo);
+						start -= 30; // cut * 2도 고려하기
+						end -= 30; // cut * 2도 고려하기
+						index -= 30; // cut * 2도 고려하기
+						count -= 15;
+						continue;
+					}
+					else {
+						continue;
+					}
+				} else if (num.charAt(0) == '>') {
+					if (end > index) {
+						System.out.println("마지막페이지입니다.");
+						sessionStorage.put("pageNo", pageNo);
+						continue;
+					}
+					sessionStorage.put("pageNo", ++pageNo);
+					count += 15;
+					continue;
+				} else {
+					BigDecimal code = (BigDecimal) sigunCode.get(Integer.parseInt(num) - 1 - count).get("CODE");
+					String id = ScanUtil.nextLine("등록할 어드민 아이디 입력 : ");
+					String pw = ScanUtil.nextLine("등록할 어드민 비밀번호 입력 : ");
+					String pw_re = ScanUtil.nextLine("비밀번호 확인 : ");
+					if (pw.equals(pw_re)) {
+						input.add(code);
+						input.add(id);
+						input.add(pw);
+						input.add(roll);
+						memberService.adminSignUp(input);
+						System.out.println("등록되었습니다.");
+						return View.ADMIN_MAIN;
+					} else {
+						System.out.println("입력하신 비밀번호가 일치하지 않습니다.");
+						return View.ADMIN_REGISTER;
+					}
+				}
 			}
 		}
-		return null;
+		return View.ADMIN_REGISTER;
 	}
 
+	/**
+	 * @return 로직 구현 완료 -홍정호 24.4.15. 19:48
+	 */
 	protected View adminEdit() {
-
-		int roll = 0; // 권한 가져와야함
-
-		if (roll != 0) {
-			System.out.println("어드민 정보 수정 페이지");
+		if (sessionStorage.get("editFlag") == null) {
+			System.out.println("접속한 어드민 계정의 정보 수정 페이지");
 			System.out.println("0을 입력해 돌아가기");
 			System.out.println("1. 비밀번호 수정");
 			int sel = ScanUtil.nextInt("메뉴 번호를 입력하세요 : ");
 			if (sel == 1) {
-				String pw = ScanUtil.nextLine("수정할 비밀번호를 입력하세요.");
+				String pw = ScanUtil.nextLine("수정할 비밀번호를 입력하세요 : ");
 				String pw_re = ScanUtil.nextLine("비밀번호 확인 : ");
+				List<Object> pw_update = new ArrayList<Object>();
+				if (pw.equals(pw_re)) {
+					pw_update.add(pw);
+					pw_update.add(sessionStorage.get("adm_id"));
+					memberService.adminPWUpdate(pw_update);
+					System.out.println("비밀번호가 변경되었습니다.");
+					return View.ADMIN_MAIN;
+				} else {
+					System.out.println("입력하신 비밀번호가 일치하지 않습니다.");
+					return View.ADMIN_EDIT;
+				}
 			} else if (sel == 0) {
 				System.out.println("돌아가기");
-
+				return View.ADMIN_MAIN;
 			}
 		} else {
+			// 로직 추가중 4.15. 18:53 
+			System.out.println("선택한 어드민 계정의 정보 수정 페이지");
+			System.out.println("0을 입력해 돌아가기");
+			System.out.println("1. 비밀번호 수정");
 			int sel = ScanUtil.nextInt("메뉴 번호를 입력하세요 : ");
 			if (sel == 1) {
-				String pw = ScanUtil.nextLine("수정할 비밀번호를 입력하세요.");
+				String pw = ScanUtil.nextLine("수정할 비밀번호를 입력하세요 : ");
 				String pw_re = ScanUtil.nextLine("비밀번호 확인 : ");
+				List<Object> pw_update = new ArrayList<Object>();
+				if (pw.equals(pw_re)) {
+					pw_update.add(pw);
+					pw_update.add(sessionStorage.get("editFlag"));
+					memberService.adminPWUpdate(pw_update);
+					System.out.println("선택한 관리자의 비밀번호가 변경되었습니다.");
+					return View.ADMIN_MAIN;
+				} else {
+					System.out.println("입력하신 비밀번호가 일치하지 않습니다.");
+					return View.ADMIN_EDIT;
+				}
 			} else if (sel == 0) {
 				System.out.println("돌아가기");
-			} else if (sel == 2) {
-				return View.ADMIN_REGISTER_ROLL;
+				return View.ADMIN_MAIN;
 			}
 		}
-		return null;
+		return View.ADMIN_MAIN;
 	}
 
 	protected View adminList() {
-		System.out.println("최고관리자의 관리자 정보 수정을 위한 목록 페이지");
+		int cut = 0;
+		int start = 0;
+		int end = 0;
+		int index = 1;
+		int count = 0;
+		List<Map<String, Object>> adminList = new ArrayList<>();
+		while (true) {
+			System.out.println("최고관리자의 관리자 정보 수정을 위한 목록 페이지");
+			// 1번 비번 수정 -- 작성중, 4.15. 17:32, 2번 권한 수정
+			int pageNo = 1;
+			if (sessionStorage.containsKey("pageNo")) {
+				pageNo = (int) sessionStorage.remove("pageNo");
+			}
+			cut = 15;
+			start = 1 + (pageNo - 1) * cut;
+			end = pageNo * cut;
 
-		System.out.println("모든 어드민 목록 출력(출력시에는 모든 정보가 포함되어 나오게");
-		// sql selectList
+			List<Object> page = new ArrayList<Object>();
+			page.add(start);
+			page.add(end);
 
-		System.out.println("목록 번호를 눌러 수정 페이지로 넘어가기");
-		// sql selectone then adminEdit()
+			adminList = memberService.adminList(page);
+			if (adminList != null && !adminList.isEmpty()) {
+				for (Map<String, Object> adminVo : adminList) {
+					System.out.println(index++ + "번 행 " + adminVo);
+				}
+			}
 
-		System.out.println("돌아가기");
+			System.out.println("<이전페이지\t\t다음페이지>");
+			String num = ScanUtil.nextLine("행 번호를 입력하세요 : "); // num-1
+			if (num.charAt(0) == '<') {
+				if (pageNo > 1) {
+					sessionStorage.put("pageNo", --pageNo);
+					start -= 30;
+					end -= 30;
+					index -= 30;
+					count -= 15;
+					continue;
+				}else {
+					continue;
+				}
+			} else if (num.charAt(0) == '>') {
+				if (end > index) {
+					System.out.println("마지막페이지입니다.");
+					sessionStorage.put("pageNo", pageNo);
+					continue;
+				}
+				count += 15;
+				sessionStorage.put("pageNo", ++pageNo);
+				continue;
+			} else {
+				String adm_id = (String) adminList.get(Integer.parseInt(num) - 1 - count).get("ADM_ID");
+				sessionStorage.put("editFlag", adm_id);
+				return View.ADMIN_EDIT;
+
+			}
+		}
+
+	}
+	
+	protected View addrSearch() {
+		
 		return null;
 	}
 
-	protected View adminRegisterRoll() {
-		System.out.println("어드민 권한 수정 페이지");
-		System.out.println("이 아이디가 가지고 있는 권한 출력");
-		System.out.println("0을 입력해 돌아가기");
-		System.out.println("1. 00도 담당자로 수정");
-		System.out.println("2. 00도 00시 00 휴양림 담당자로 수정");
 
-		// 권한이 null 또는 없을시
-		System.out.println("권한 부여 : 1. 도담당자 2. 휴양림 담당자");
-
-		// 1. 도 담당자일경우
-		System.out.println("도를 숫자로 입력하시오 : 1. 강원, 2.경기.... ");
-
-		// 2. 휴양림 담당자일경우
-		System.out.println("휴양림 검색 또는 키워드 입력");
-
-		return null;
-	}
 
 	protected View adminForestList() {
 
