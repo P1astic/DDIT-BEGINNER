@@ -3,6 +3,7 @@ package kr.or.ddit.dao;
 import java.util.List;
 
 import kr.or.ddit.util.JDBCUtil;
+import kr.or.ddit.vo.AdminVo;
 import kr.or.ddit.vo.MemberVo;
 
 public class ForestTripDao {
@@ -44,5 +45,36 @@ public class ForestTripDao {
 					"SET MEM_PW = ?\r\n" + 
 					"WHERE MEM_ID = ?";
 		jdbc.update(sql, param);
+	}
+	
+	public MemberVo myPage(List<Object> param) {
+      String sql ="SELECT * FROM FOREST_MEMBER\r\n" + 
+               	  "WHERE MEM_PW = ?";
+      
+      return jdbc.selectOne(sql, param, MemberVo.class);
+	      
+    }
+	
+	public void phoneUpdate(List<Object> param) {
+		String sql ="UPDATE FOREST_MEMBER\r\n" + 
+					"SET MEM_PHONE = ?\r\n" + 
+					"WHERE MEM_ID = ?";
+		
+		jdbc.update(sql, param);
+	}
+	
+	public void mailUpdate(List<Object> param) {
+		String sql ="UPDATE FOREST_MEMBER\r\n" + 
+					"SET MEM_MAIL = ?\r\n" + 
+					"WHERE MEM_ID = ?";
+	
+		jdbc.update(sql, param);
+	}
+	
+	public AdminVo adminLogin(List<Object> param) {
+		String sql ="SELECT * FROM FOREST_ADMIN\r\n" + 
+					"WHERE ADM_ID = ? AND ADM_PW = ?";
+		
+		return jdbc.selectOne(sql, param, AdminVo.class);
 	}
 }
