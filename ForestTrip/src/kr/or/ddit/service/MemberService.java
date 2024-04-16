@@ -6,6 +6,7 @@ import java.util.Map;
 import kr.or.ddit.dao.ForestTripDao;
 import kr.or.ddit.view.ForestTripView;
 import kr.or.ddit.vo.AdminVo;
+import kr.or.ddit.vo.BookVo;
 import kr.or.ddit.vo.MemberVo;
 
 public class MemberService {
@@ -102,6 +103,10 @@ public class MemberService {
 	
 	public List<Map<String, Object>> adminList(List<Object> param) {
 		return forestDao.adminList(param);
+	}
+	
+	public List<Map<String, Object>> bookflagList(){
+		return forestDao.bookflagList();
 	}
 	
 

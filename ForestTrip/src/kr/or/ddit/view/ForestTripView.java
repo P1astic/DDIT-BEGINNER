@@ -2,16 +2,18 @@ package kr.or.ddit.view;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import kr.or.ddit.controller.EgovController;
 import kr.or.ddit.service.ForestTripService;
 import kr.or.ddit.service.MemberService;
 import kr.or.ddit.util.ScanUtil;
+import kr.or.ddit.vo.BookVo;
 
 public class ForestTripView {
 	public static ArrayList<Object> address_output = new ArrayList<>();
@@ -25,6 +27,7 @@ public class ForestTripView {
 				break;
 			case USER_HOME:
 				view = userHome();
+				break;
 			case USER_LOGIN:
 				view = userLogin();
 				break;
@@ -68,7 +71,7 @@ public class ForestTripView {
 				view = adminForestRegister();
 				break;
 			case ADMIN_FOREST_DETAIL_REGI:
-				view = adminForestDetailRegi();
+				view = adminForestRoomInsert();
 				break;
 			case ADMIN_FOREST_EDIT:
 				view = adminForestEdit();
@@ -85,12 +88,6 @@ public class ForestTripView {
 			case FOREST_BOOKING:
 				view = forestBooking();
 				break;
-			case FOREST_LIST:
-				view = forestList();
-				break;
-			case ADDR_SEARCH:
-				view = addrSearch();
-				break;
 			default:
 				break;
 			}
@@ -101,21 +98,14 @@ public class ForestTripView {
 	ForestTripService forestService = ForestTripService.getInstance();
 	MemberService memberService = MemberService.getInstance();
 	EgovController egov = new EgovController();
-
-	int index = 1;
+	Calendar cal = Calendar.getInstance();
+	LocalDate now = LocalDate.now();
 
 	// 돌아가기와 0을 눌러 돌아가기는 다른 기능
 
 	protected View main() throws IOException {
 		// TODO Auto-generated method stub
 		// 관리자모드는 숨김처리해야함
-		
-//		String user_addr = ScanUtil.nextLine("주소 도로명으로 검색 하세요 : ");
-//		egov.EgovController(user_addr);
-//		for(int i =0;i<address_output.size(); i++) {
-//			System.out.println(address_output.get(i));
-//			
-//		}
 
 		System.out.println("1.로그인하기");
 		System.out.println("2.비회원으로 조회하기");
@@ -135,6 +125,8 @@ public class ForestTripView {
 			return View.USER_FIND;
 		case 5:
 			return View.ADMIN_LOGIN;
+		case 6:
+			return View.FOREST_BOOKING;
 		default:
 			return View.MAIN;
 		}
@@ -183,77 +175,76 @@ public class ForestTripView {
 		return View.MAIN;
 	}
 
+	/**
+	 * @return 회원가입 기능 구현 완료 홍정호 4.16. 17:34
+	 * @throws IOException
+	 */
 	protected View signUp() throws IOException {
-
-		// 값 입력 체크 알고리즘 필요
-		Scanner scanner = new Scanner(System.in);
-		List<Object> param = new ArrayList<Object>();
-		System.out.println("회원가입을 시작합니다.");
-
-//		System.out.println("이름을 입력하세요 : ");
-//		String user_name = scanner.nextLine();
-//		System.out.println("ID를 입력하세요 : ");
-//		// 아이디 입력 및 중복 검사
-//		String user_id;
-//		do {
-//			System.out.print("아이디를 입력하세요: ");
-//			user_id = scanner.nextLine();
-//			if (!isUsernameValid(user_id)) {
-//				System.out.println("아이디는 5자 이상 15자 미만의 영문과 숫자의 조합이어야 합니다.");
-//			}
-//		} while (!isUsernameValid(user_id) || isUsernameDuplicate(user_id));
-//
-//		System.out.println("PW를 입력하세요.");
-//		String user_pw;
-//		// 비밀번호 입력 및 검사
-//		do {
-//			System.out.print("비밀번호를 입력하세요: ");
-//			user_pw = scanner.nextLine();
-//			if (!isPasswordValid(user_pw)) {
-//				System.out.println("비밀번호는 5자 이상 15자 미만의 영문, 숫자, 특수기호의 조합이어야 합니다.");
-//			}
-//		} while (!isPasswordValid(user_pw));
-//
-//		// 이메일 입력 및 유효성 검사
-//		String user_email;
-//		do {
-//			System.out.print("이메일을 입력하세요: ");
-//			user_email = scanner.nextLine();
-//			if (!isEmailValid(user_email)) {
-//				System.out.println("유효하지 않은 이메일 형식입니다. 다시 입력해주세요.");
-//			}
-//		} while (!isEmailValid(user_email));
-//
-//		// 전화번호 입력 및 형식 검사
-//		System.out.print("전화번호를 입력하세요 (ex. 010-1234-5678): ");
-//		String user_phone = scanner.nextLine();
-//		if (!isPhoneNumberValid(user_phone)) {
-//			System.out.println("유효하지 않은 전화번호 형식입니다.");
-//			// 전화번호 형식이 잘못되었을 경우, 원하는 방법으로 처리할 수 있습니다.
-//		}
-
-
-
+		String user_id;
+		String user_pw;
+		String user_email;
+		String user_phone;
 		int cut = 0;
 		int start = 0;
 		int end = 0;
-		int index = 1;
-		int count = 0;
+		int index = 0;
+		int pageNo = 1;
+
+		// 값 입력 체크 알고리즘 필요
+		List<Object> param = new ArrayList<Object>();
+		System.out.println("회원가입을 시작합니다.");
+
+		String user_name = ScanUtil.nextLine("이름을 입력하세요 : ");
+		// 아이디 입력 및 중복 검사
+		do {
+			user_id = ScanUtil.nextLine("아이디를 입력하세요: ");
+			if (!isUsernameValid(user_id)) {
+				System.out.println("아이디는 5자 이상 15자 미만의 영문과 숫자의 조합이어야 합니다.");
+			}
+		} while (!isUsernameValid(user_id) && isUsernameDuplicate(user_id));
+
+		// 비밀번호 입력 및 검사
+		do {
+			user_pw = ScanUtil.nextLine("비밀번호를 입력하세요: ");
+			if (!isPasswordValid(user_pw)) {
+				System.out.println("비밀번호는 5자 이상 15자 미만의 영문, 숫자, 특수기호의 조합이어야 합니다.");
+			}
+		} while (!isPasswordValid(user_pw));
+
+		// 이메일 입력 및 유효성 검사
+		do {
+			user_email = ScanUtil.nextLine("이메일을 입력하세요: ");
+			if (!isEmailValid(user_email)) {
+				System.out.println("유효하지 않은 이메일 형식입니다. 다시 입력해주세요.");
+			}
+		} while (!isEmailValid(user_email));
+
+		// 전화번호 입력 및 형식 검사
+		user_phone = ScanUtil.nextLine("전화번호를 입력하세요 (ex. 010-1234-5678): ");
+		if (!isPhoneNumberValid(user_phone)) {
+			System.out.println("유효하지 않은 전화번호 형식입니다.");
+			// 전화번호 형식이 잘못되었을 경우, 원하는 방법으로 처리할 수 있습니다.
+		}
+
 		String user_addr = ScanUtil.nextLine("주소 도로명으로 검색 하세요 : ");
-		// 주소 검색 알고리즘 필요
+		egov.EgovController(user_addr);
+		index = address_output.size();
 		while (true) {
-			int pageNo = 1;
 			if (sessionStorage.containsKey("pageNo")) {
 				pageNo = (int) sessionStorage.remove("pageNo");
 			}
 			cut = 10;
-			start = 1 + (pageNo - 1) * cut;
+			start = (pageNo - 1) * cut;
 			end = pageNo * cut;
 
-			egov.EgovController(user_addr);
-			for (int i = start; i <end ; i++) {
-				System.out.println(i + "번 행 " + address_output.get(i));
-				
+			for (int i = start; i < end; i++) {
+				if (end > index) {
+					for (i = start; i < index; i++) {
+						System.out.println(i + 1 + "번 행 " + address_output.get(i));
+					}
+					break;
+				}
+				System.out.println(i + 1 + "번 행 " + address_output.get(i));
 			}
 
 			System.out.println("<이전페이지\t\t다음페이지>");
@@ -262,10 +253,8 @@ public class ForestTripView {
 			if (user_addr_input.charAt(0) == '<') {
 				if (pageNo > 1) {
 					sessionStorage.put("pageNo", --pageNo);
-					start -= 20;
-					end -= 20;
-					index -= 20;
-					count -= 10;
+					start -= 10;
+					end -= 10;
 					continue;
 				} else {
 					continue;
@@ -277,20 +266,28 @@ public class ForestTripView {
 					continue;
 				}
 				sessionStorage.put("pageNo", ++pageNo);
-				count += 10;
 				continue;
+			} else if (user_addr_input.charAt(0) == '0') {
+				return View.USER_SIGNUP;
 			} else {
 
-				// 돌아가기 알고리즘 필요
-				System.out.println("돌아가기");
-//				param.add(user_id);
-//				param.add(user_pw);
-//				param.add(user_name);
-//				param.add(user_email);
-//				param.add(user_phone);
-				// 회원가입 주소 검색 및 mem_no 시퀀스 구현 필요 - 홍정호 24.4.13.17:26
-				memberService.userSignUp(param);
+				String addr = (String) address_output.get(Integer.parseInt(user_addr_input) - 1);
+				String addr_detail = ScanUtil.nextLine("상세 주소 입력해주세요 : ");
+				String addr_result = addr + " " + addr_detail;
 
+//				// 돌아가기 알고리즘 필요
+//				System.out.println("돌아가기");
+				param.add(user_id);
+				param.add(user_pw);
+				param.add(user_name);
+				param.add(addr_result);
+				param.add(user_phone);
+				param.add(user_email);
+
+				System.out.println(param);
+
+				memberService.userSignUp(param);
+				System.out.println("회원가입이 완료되었습니다.");
 				return View.MAIN;
 			}
 
@@ -298,33 +295,33 @@ public class ForestTripView {
 
 	}
 
-//	// 아이디 유효성 검사 메서드
-//	public static boolean isUsernameValid(String user_name) {
-//		return user_name.matches("^[a-zA-Z](?=.*[a-zA-Z])(?=.*\\\\d)[a-zA-Z\\\\d]{5,15}$");
-//	}
-//
-//	// 아이디 중복 검사 메서드 (가정)
-//	public static boolean isUsernameDuplicate(String user_name) {
-//		// 여기에 중복 검사하는 코드를 추가하세요. - 김동오 24.4.13.17:26
-//		// 실제로는 데이터베이스에서 아이디를 검색하여 중복을 확인할 수 있습니다.
-//
-//		return false; // 가정상 중복이 없다고 가정
-//	}
-//
-//	// 비밀번호 유효성 검사 메서드
-//	public static boolean isPasswordValid(String user_pw) {
-//		return user_pw.matches("^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{5,15}$");
-//	}
-//
-//	// 이메일 유효성 검사 메서드
-//	public static boolean isEmailValid(String user_email) {
-//		return user_email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
-//	}
-//
-//	// 전화번호 형식 검사 메서드
-//	public static boolean isPhoneNumberValid(String user_phone) {
-//		return user_phone.matches("^\\d{3}-\\d{3,4}-\\d{4}$");
-//	}
+	// 아이디 유효성 검사 메서드
+	public static boolean isUsernameValid(String user_name) {
+		return user_name.matches("^[a-zA-Z][a-zA-Z\\d]{4,14}$");
+	}
+
+	// 아이디 중복 검사 메서드 (가정)
+	public static boolean isUsernameDuplicate(String user_id) {
+		// 여기에 중복 검사하는 코드를 추가하세요. - 김동오 24.4.13.17:26
+		// 실제로는 데이터베이스에서 아이디를 검색하여 중복을 확인할 수 있습니다.
+
+		return false; // 가정상 중복이 없다고 가정
+	}
+
+	// 비밀번호 유효성 검사 메서드
+	public static boolean isPasswordValid(String user_pw) {
+		return user_pw.matches("^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{5,15}$");
+	}
+
+	// 이메일 유효성 검사 메서드
+	public static boolean isEmailValid(String user_email) {
+		return user_email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+	}
+
+	// 전화번호 형식 검사 메서드
+	public static boolean isPhoneNumberValid(String user_phone) {
+		return user_phone.matches("^\\d{3}-\\d{3,4}-\\d{4}$");
+	}
 
 	protected View userFind() {
 		System.out.println("아이디/비밀번호찾기 페이지입니다.");
@@ -441,7 +438,9 @@ public class ForestTripView {
 			return View.USER_MYPAGE;
 
 		} else if (sel == 3) {
+
 			// 주소검색 api 적용 필요
+
 			System.out.println("-------------------주소검색");
 			String address = ScanUtil.nextLine("변경할 주소를 입력하세요 : ");
 			return View.USER_MYPAGE;
@@ -908,17 +907,48 @@ public class ForestTripView {
 
 	}
 
-	protected View addrSearch() {
-
-		return null;
-	}
-
 	protected View adminForestList() {
 
-		int roll = 0;
+		int cut = 0;
+		int start = 0;
+		int end = 0;
+		int index = 1;
+		int count = 0;
+		List<Map<String, Object>> forestList = new ArrayList<>();
+		int code = (int) sessionStorage.get("adm_code");
+		int roll = (int) sessionStorage.get("adm_roll");
+		String adm_no = (String) sessionStorage.get("adm_no");
 		// sql로 로그인 한 계정의 roll 가져오기
 
 		System.out.println("어드민의 휴양림 목록 출력 페이지");
+
+		if (roll == 1) {
+		} else if (roll == 2) {
+			// 도담당자 << 도 밑에 있는거 전부다
+		} else if (roll == 3) {
+			// 휴양림담당자 <<휴양림담당장에 배정된 휴양림만
+			int pageNo = 1;
+			cut = 10;
+			start = 1 + (pageNo - 1) * cut;
+			end = pageNo * cut;
+
+			List<Object> param = new ArrayList<>();
+			param.add(start);
+			param.add(end);
+//			param.add(code);
+			param.add(adm_no);
+
+			// 최고관리자 << 싹다
+			forestList = forestService.ForestList(param);
+
+			if (forestList != null && !forestList.isEmpty()) {
+				for (Map<String, Object> forestVo : forestList) {
+					System.out.println(index++ + "번 행 " + forestVo);
+				}
+			}
+			System.out.println("<이전페이지\t\t다음페이지>");
+			String num = ScanUtil.nextLine("행 번호를 입력하세요 : "); // num-1
+		}
 		// sql selectList
 
 		System.out.println("어드민 계정이 도담당자일경우 도 단위의 목록 출력");
@@ -936,44 +966,146 @@ public class ForestTripView {
 	protected View adminForestRegister() {
 
 		System.out.println("어드민의 휴양림 등록");
-		String forest_name = ScanUtil.nextLine("1. 휴양림명 등록");
+
+//		List<AdminVo> RoomList = forestService.roomInsert();
+		String forest_name = ScanUtil.nextLine("1. 휴양림명 등록 :");
 //		String forest_addr_base = ("2. 기본주소(시도, 시군)는 자동 입력");
 		// sql을 통해 관리자 계정의 시도 시군 스트링 값 가지고 오기
 
-		String forest_addr_detail = ScanUtil.nextLine("3. 주소 검색 후 상세주소 입력");
-		String room_name = ScanUtil.nextLine("4. 객실 명을 입력하세요. 추가 객실은 상세 정보에서 등록이 가능합니다.");
+		String forest_addr_detail = ScanUtil.nextLine("3. 주소 검색 후 상세주소 입력 :");
+		String room_name = ScanUtil.nextLine("4. 객실 명을 입력하세요. 추가 객실은 상세 정보에서 등록이 가능합니다. :");
 		int room_qty = ScanUtil.nextInt("5. 최대 이용인원 등록 : ");
 
+		String room_notice = ScanUtil.nextLine("6. 공지사항 : ");
+
+		List<Object> param = new ArrayList();
+		param.add(forest_name);
+		param.add(forest_addr_detail);
+		param.add(room_name);
+		param.add(room_qty);
+		param.add(room_notice);
+
+		forestService.forestInsert(param);
 		return View.ADMIN_MAIN;
 	}
 
 	protected View adminForestEdit() {
-		System.out.println("어드민의 휴양림 정보 수정");
+		System.out.println("Admin의 휴양림 정보 수정 페이지입니다.");
+//	    System.out.println(forestList);
+		int cut = 0;
+		int start = 0;
+		int end = 0;
+		int index = 1;
+		int count = 0;
+		List<Map<String, Object>> forestList = new ArrayList<>();
+		List<Object> param = new ArrayList<>();
+		while (true) {
+			System.out.println("휴양림 목록 불러오기");
+			int pageNo = 1;
+			if (sessionStorage.containsKey("pageNo")) {
+				pageNo = (int) sessionStorage.remove("pageNo");
+			}
+			cut = 10;
+			start = 1 + (pageNo - 1) * cut;
+			end = pageNo * cut;
 
-		System.out.println("목록에서 선택 후 상세 정보로 이동");
-		// sql selectList, 상세정보는 객실명, 수용인원, 공지사항
-		System.out.println("상세 정보에는 최초로 등록한 모든 정보가 출력되고 사용자는" + "컬럼을 선택해서 그 정보를 수정");
-		int num = ScanUtil.nextInt("컬럼 번호를 입력하세요.");
-		// pagination 구현 필요
+			List<Object> page = new ArrayList<>();
+			page.add(start);
+			page.add(end);
+			page.add(sessionStorage.get("adm_no"));
 
-		System.out.println("수정 시 경고문");
-		System.out.println("예시) 정보를 바꿀 시 사용자가 이를 모를 수도 있다~~ 이런식으로");
+			forestList = forestService.ForestList(page);
 
-		System.out.println("돌아가기");
+			if (forestList != null && !forestList.isEmpty()) {
+				for (Map<String, Object> forestVo : forestList) {
+					System.out.println(index++ + "번 행 " + forestVo);
+				}
+			}
 
-		return View.ADMIN_MAIN;
+			System.out.println("<이전페이지\t\t다음페이지>");
+			String num = ScanUtil.nextLine("상세 정보를 보실 forest의 행 번호를 입력하세요 : "); // num-1
+
+			if (num.charAt(0) == '<') {
+				if (pageNo > 1) {
+					sessionStorage.put("pageNo", --pageNo);
+					start -= 20;
+					end -= 20;
+					index -= 20;
+					count -= 10;
+					continue;
+				} else {
+					continue;
+				}
+			} else if (num.charAt(0) == '>') {
+				if (end > index) {
+					System.out.println("마지막페이지입니다.");
+					sessionStorage.put("pageNo", pageNo);
+					continue;
+				}
+				sessionStorage.put("pageNo", ++pageNo);
+				count += 10;
+				continue;
+			} else {
+				/// 로직 추가 필요 4.16. 16:21 김동오 홍정호
+
+				System.out.println("선택하신 휴양림의 상세정보입니다.");
+
+//				List<Object> param;
+//				List<Object> a=forestService.ForestList(param);
+				int sel = ScanUtil.nextInt("수정할 메뉴를 선택해주세요.");
+				System.out.println("1.휴양림이름  2.휴양림 소개  3.휴양림 공지  4.휴양림 주소");
+				if (sel == 1) {
+					System.out.println("정보 수정 시 사용자가 이를 모를 수도 있습니다.");
+					String Forest_Name = ScanUtil.nextLine("수정 할 휴양림 이름을 입력해주세요.");
+
+				} else if (sel == 2) {
+					System.out.println("정보 수정 시 사용자가 이를 모를 수도 있습니다.");
+					String Forest_Intro = ScanUtil.nextLine("수정 할 휴양림 소개를 입력해주세요.");
+
+				} else if (sel == 3) {
+					System.out.println("정보 수정 시 사용자가 이를 모를 수도 있습니다.");
+					String Forest_Notice = ScanUtil.nextLine("수정 할 휴양림 공지를 입력해주세요.");
+
+				} else if (sel == 4) {
+					System.out.println("정보 수정 시 사용자가 이를 모를 수도 있습니다.");
+					String Forest_Addr = ScanUtil.nextLine("수정 할 휴양림 주소를 입력해주세요.");
+
+				} else {
+					System.out.println("잘못입력하셨습니다 휴양림 정보 수정페이지로 돌아갑니다.");
+					return View.ADMIN_FOREST_EDIT;
+				}
+
+////				String forest_No = ScanUtil.nextLine("상세 정보를 보실 FOREST_NO를 입력해주세요.");
+//				// sql selectList, 상세정보는 객실명, 수용인원, 공지사항
+//				System.out.println("상세 정보에는 최초로 등록한 모든 정보가 출력되고 사용자는" + "컬럼을 선택해서 그 정보를 수정");
+//				
+////				int num = ScanUtil.nextInt("컬럼 번호를 입력하세요.");
+//				// pagination 구현 필요
+//
+//				System.out.println("수정 시 경고문");
+//				System.out.println("예시) 정보를 바꿀 시 사용자가 이를 모를 수도 있다~~ 이런식으로");
+//
+//				System.out.println("돌아가기");
+
+				return View.ADMIN_MAIN;
+			}
+		}
 
 	}
 
-	protected View adminForestDetailRegi() {
-		System.out.println("휴양림 상세정보 등록(휴양림 목록 페이지에서 접근)");
+	protected View adminForestRoomInsert() {
+		System.out.println("휴양림 객실 추가 등록(휴양림 목록 페이지에서 접근)");
 
-		System.out.println("객실 추가등록(객실명, 수용인원), 공지사항 작성");// 공지사항은 객실에 종속 또는 휴양림 공지사항
+		System.out.println("객실 추가등록(객실명, 수용인원)");// 공지사항은 객실에 종속 또는 휴양림 공지사항
 
 		String room_name = ScanUtil.nextLine("객실명을 입력하세요 : ");
 		int room_qty = ScanUtil.nextInt("수용인원을 입력하세요 : ");
-		String room_notice = ScanUtil.nextLine("객실 공지사항을 작성하세요 : ");
 
+		List<Object> param = new ArrayList();
+		param.add(room_name);
+		param.add(room_qty);
+
+		forestService.forestRoomInsert(param);
 		return View.ADMIN_MAIN;
 	}
 
@@ -994,26 +1126,20 @@ public class ForestTripView {
 	protected View forestSearch() {
 		// 사용자 휴양림 검색 페이지
 		System.out.println("휴양림 검색 페이지, 비회원도 가능 단 예약시에는 회원만 가능");
-		System.out.println("검색 조건 : 1.도 입력   2.시(군)입력  3.날짜선택  4.인원입력 ");
-		// 도 목록 보여주기 json 또는 생성자
-		// 시군 목록 보여주기 json 또는 생성자
+		System.out.println("검색 조건 : 1.도 입력  또는 시(군)입력  3.인원입력 "); // 2. 날짜선택
+		String input = ScanUtil.nextLine("1. 시도 또는 시군 입력 ex)강원, 강릉, 대전: ");
+		// 시도 시군 검색 목록 보여주기 json 또는 생성자
+
+		int people_qty = ScanUtil.nextInt("3. 인원 입력 : ");
 		// 날짜는 현재날짜 기준으로
-		int qty = ScanUtil.nextInt("인원을 입력해주세요 : ");
 
 		// 날짜 선택 시 달력만들기
+
+		int qty = ScanUtil.nextInt("인원을 입력해주세요 : ");
+		// 인원입력 한 검색목록 보여주기
+
 		System.out.println("*******프로젝트 진행 속도에 따라 사용자는 1박만 하게 해야 할 수 있음*******");
 
-		return null;
-	}
-
-	protected View forestList() {
-		// 사용자 휴양림 목록 페이지
-		System.out.println("forestSearch 조건에 부합하는 휴양림 목록 출력");
-		System.out.println("사용자는 목록에서 번호 입력해서 상세 정보 조회 페이지로 이동");
-		int row = ScanUtil.nextInt("목록 번호를 입력하세요 : ");
-		// pagination 필요
-
-		System.out.println("돌아가기");
 		return null;
 	}
 
@@ -1028,11 +1154,60 @@ public class ForestTripView {
 	}
 
 	protected View forestBooking() {
-		System.out.println("예약하기 페이지");
-		System.out.println("검색조건에서 입력된 정보를 자동으로 입력");
 
-		System.out.println("돌아가기");
-		return null;
+		System.out.println("예약하기 페이지");
+		int year = cal.get(Calendar.YEAR);
+		int month = cal.get(Calendar.MONTH) + 1;
+		List<Map<String, Object>> list = new ArrayList<>();
+		while (true) {
+			list = memberService.bookflagList();
+			for (Map<String, Object> map : list) {
+				System.out.println(map.get("BOOK_D_START"));
+				System.out.println(map.get("BOOK_D_END"));
+			}
+
+			Calendar cal = Calendar.getInstance();
+			cal.set(year, month - 1, 1);
+			int lastDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+			int startDay = cal.get(Calendar.DAY_OF_WEEK);
+
+			int currentDay = 1;
+			System.out.println(year + "년 " + month + "월\n");
+			System.out.println("일\t월\t화\t수\t목\t금\t토");
+
+			for (int i = 1; i <= lastDay + startDay - 1; i++) {
+				if (i < startDay) {
+					System.out.print("\t");
+				} else {
+					// if
+					System.out.printf("%02d\t", currentDay);
+					currentDay++;
+				}
+				if (i % 7 == 0) {
+					System.out.println();
+				}
+			}
+			System.out.println();
+			System.out.println("<이전달\t\t다음달>");
+			String input = ScanUtil.nextLine("예약을 원하는 일자를 입력하세요 : ");
+
+			if (input.charAt(0) == '<') {
+				if (month == 4) {
+					System.out.println("2024년 4월 이전으로는 갈 수 없습니다.");
+					continue;
+				}
+				month--;
+			} else if (input.charAt(0) == '>') {
+				if (month == 6) {
+					System.out.println("2024년 6월 이후로는 갈 수 없습니다.");
+					continue;
+				}
+				month++;
+			} else {
+				System.out.println("해당 일자로 예약을 진행합니다.");
+			}
+		}
+
 	}
 
 }

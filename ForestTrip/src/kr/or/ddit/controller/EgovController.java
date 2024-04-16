@@ -65,9 +65,9 @@ public class EgovController {
 			JSONObject roadAddr = new JSONObject();
 			JSONArray jibunAddr_array = new JSONArray();
 			JSONArray roadAddr_array = new JSONArray();
-
 			// 상세주소 출력 알고리즘
 			for (int i = 0; i < juso_detail.size(); i++) {
+
 //				System.out.println(juso_detail.get(i));
 				jibunAddr = (JSONObject) juso_detail.get(i);
 				roadAddr = (JSONObject) juso_detail.get(i);
