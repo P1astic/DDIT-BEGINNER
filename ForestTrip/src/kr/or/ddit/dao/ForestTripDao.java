@@ -81,6 +81,14 @@ public class ForestTripDao {
 		jdbc.update(sql, param);
 	}
 	
+	public void addressUpdate(List<Object> param) {
+		String sql ="UPDATE FOREST_MEMBER\r\n" + 
+					"SET MEM_ADDR = ?\r\n" + 
+					"WHERE MEM_ID = ?";
+		
+		jdbc.update(sql, param);
+	}
+	
 	public AdminVo adminLogin(List<Object> param) {
 		String sql ="SELECT * FROM FOREST_ADMIN\r\n" + 
 					"WHERE ADM_ID = ? AND ADM_PW = ?";

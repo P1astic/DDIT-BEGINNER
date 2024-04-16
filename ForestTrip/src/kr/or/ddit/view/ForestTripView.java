@@ -412,7 +412,12 @@ public class ForestTripView {
 		return View.USER_HOME;
 	}
 
-	protected View userMyPageEdit() {
+	protected View userMyPageEdit() throws IOException {
+		int cut = 0;
+		int start = 0;
+		int end = 0;
+		int index = 0;
+		int pageNo = 1;
 		System.out.println("사용자정보 수정페이지");
 		System.out.println("비밀번호는 1, 전화번호는 2, 주소는 3, 메일은 4를 입력하세요");
 		int sel = ScanUtil.nextInt("메뉴번호를 입력하세요 : ");
@@ -440,10 +445,63 @@ public class ForestTripView {
 		} else if (sel == 3) {
 
 			// 주소검색 api 적용 필요
-
 			System.out.println("-------------------주소검색");
 			String address = ScanUtil.nextLine("변경할 주소를 입력하세요 : ");
-			return View.USER_MYPAGE;
+			egov.EgovController(address);
+			index = address_output.size();
+			while(true) {
+				if(sessionStorage.containsKey("pageNo")) {
+					pageNo = (int) sessionStorage.remove("pageNo");
+				}
+				cut = 10;
+				start = (pageNo -1) * cut;
+				end = pageNo * cut;
+				
+				for(int i = start; i<end; i++) {
+					if(end>index) {
+						for(i=start; i<index; i++) {
+							System.out.println(i+1 + "번 행 " + address_output.get(i));
+						}
+						break;
+					}
+					System.out.println(i+1 + "번 행 " + address_output.get(i));
+				}
+				System.out.println("<이전페이지\t\t다음페이지>");
+				String user_addr_input = ScanUtil.nextLine("본인이 거주하고 있는 주소의 행 번을 입력하세요(주소 재검색은 0번) : ");
+				
+				if (user_addr_input.charAt(0) == '<') {
+					if (pageNo > 1) {
+						sessionStorage.put("pageNo", --pageNo);
+						start -= 10;
+						end -= 10;
+						continue;
+					} else {
+						continue;
+					}
+				} else if (user_addr_input.charAt(0) == '>') {
+					if (end > index) {
+						System.out.println("마지막페이지입니다.");
+						sessionStorage.put("pageNo", pageNo);
+						continue;
+					}
+					sessionStorage.put("pageNo", ++pageNo);
+					continue;
+				} else if (user_addr_input.charAt(0) == '0') {
+					return View.USER_SIGNUP;
+				} else {
+
+					String addr = (String) address_output.get(Integer.parseInt(user_addr_input) - 1);
+					String addr_detail = ScanUtil.nextLine("상세 주소 입력해주세요 : ");
+					String addr_result = addr + " " + addr_detail;
+					
+					List<Object> param = new ArrayList<>();
+					param.add(sessionStorage.get("mem_id"));
+					param.add(addr_result);
+					memberService.addressUpdate(param);
+					System.out.println("회원가입이 완료되었습니다.");
+					return View.MAIN;
+				}
+			}
 		} else if (sel == 4) {
 			String mail = ScanUtil.nextLine("변경할 메일을 입력하세요 : ");
 			List<Object> phone_input = new ArrayList<Object>();

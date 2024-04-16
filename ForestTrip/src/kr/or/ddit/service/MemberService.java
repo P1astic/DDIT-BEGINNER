@@ -80,6 +80,10 @@ public class MemberService {
 		forestDao.mailUpdate(param);
 	}
 	
+	public void addressUpdate(List<Object> param) {
+		forestDao.addressUpdate(param);
+	}
+	
 	public boolean adminLogin(List<Object> param) {
 		AdminVo checkFlag = forestDao.adminLogin(param);
 		if(checkFlag == null) {
