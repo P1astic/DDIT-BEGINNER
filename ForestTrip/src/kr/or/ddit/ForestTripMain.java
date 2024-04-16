@@ -1,5 +1,7 @@
 package kr.or.ddit;
 
+import java.io.IOException;
+
 import kr.or.ddit.view.ForestTripView;
 
 /**
@@ -8,7 +10,7 @@ import kr.or.ddit.view.ForestTripView;
  */
 public class ForestTripMain extends ForestTripView {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		new ForestTripMain().mainStart();
 	}
 
