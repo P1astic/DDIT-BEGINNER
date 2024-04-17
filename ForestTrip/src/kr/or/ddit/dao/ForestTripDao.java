@@ -6,6 +6,7 @@ import java.util.Map;
 import kr.or.ddit.util.JDBCUtil;
 import kr.or.ddit.vo.AdminVo;
 import kr.or.ddit.vo.BookVo;
+import kr.or.ddit.vo.ForestVo;
 import kr.or.ddit.vo.MemberVo;
 
 public class ForestTripDao {
@@ -153,13 +154,21 @@ public class ForestTripDao {
 		return jdbc.selectList(sql, page);
 	}
 	
-	public List<Map<String, Object>> bookflagList(){
-		String sql = "SELECT ROOM_NO, BOOK_QTY,\r\n" + 
-				"TO_CHAR(BOOK_D_START,'YYYY/MM/DD') AS BOOK_D_START, TO_CHAR(BOOK_D_END,'YYYY/MM/DD') AS BOOK_D_END\r\n" + 
-				"FROM FOREST_BOOK";
+	public List<Map<String, Object>> bookflagList(List<Object> param){
+		String sql ="SELECT ROOM_NO, BOOK_QTY,\r\n" + 
+					"TO_CHAR(BOOK_D_START,'YYYY/MM/DD') AS BOOK_D_START, TO_CHAR(BOOK_D_END,'YYYY/MM/DD') AS BOOK_D_END\r\n" + 
+					"FROM FOREST_BOOK WHERE ROOM_NO = ?";
 		
-		return jdbc.selectList(sql);
+		return jdbc.selectList(sql, param);
 		
+	}
+	
+	public List<BookVo> bookCheck(List<Object> param) {
+		String sql ="SELECT ROOM_NO, BOOK_QTY,\r\n" + 
+					"TO_CHAR(BOOK_D_START,'YYYY/MM/DD') AS BOOK_D_START, TO_CHAR(BOOK_D_END,'YYYY/MM/DD') AS BOOK_D_END\r\n" + 
+					"FROM FOREST_BOOK WHERE BOOK_D_START = ? AND ROOM_NO = ?";
+		
+		return jdbc.selectList(sql, param, BookVo.class);
 	}
 	//휴양림 등록
 	public void forestInsert(List<Object>param){
@@ -177,12 +186,11 @@ public class ForestTripDao {
 	
 	//휴양림 상세등록  
 	public void forestRoomInsert(List<Object>param) {
-		String sql ="INSERT INTO FOREST_ROOM  \r\n" + 
-					"VALUES (SELECT 'A' || TO_CHAR(MAX(TO_NUMBER(SUBSTR(ROOM_NO, 2))) + 1) FROM FOREST_ADMIN),\\r\\n\","
-					+ "SELECT 'A' || TO_CHAR(MAX(TO_NUMBER(SUBSTR(FOREST_NO, 2))) + 1) FROM FOREST_ADMIN),\\r\\n\","
-					+ "?,"	//ROOM_NAME
-					+ "?,"	//ROOM_QTY
-					+ "'N')\r\n";
+		String sql ="INSERT INTO FOREST_ROOM (ROOM_NO, FOREST_NO, ROOM_NAME, ROOM_QTY)\r\n" + 
+					"SELECT CONCAT('R', TO_CHAR(TO_NUMBER(SUBSTR(MAX(ROOM_NO), 2)) + 1, 'FM00000')),\r\n" + 
+					"       'F' || LPAD(TO_NUMBER(SUBSTR(MAX(FOREST_NO), 2)) + 1, 5, '0'), \r\n" + 
+					"       ?, ?\r\n" + 
+					"FROM FOREST_ROOM;";
 		//room_no,forest_no,room_name,room_qty,room_flag
 		jdbc.update(sql,param);
 	}
@@ -227,18 +235,19 @@ public class ForestTripDao {
 
 	}
 	
-	public Map<String, Object> ForestRoomDetail(List<Object>param) {
-		String sql = "SELECT FOREST_NO, ADM_NO, FOREST_NAME, FOREST_INTRO, FOREST_NOTICE, FOREST_ADDR\r\n" + 
-				"FROM FOREST\r\n" + 
-				"WHERE FOREST_NO= ? ";
+	public Map<String, Object> forestDetail(List<Object>param) {
+		String sql ="SELECT FOREST_NO, ADM_NO, FOREST_NAME, FOREST_INTRO, FOREST_NOTICE, FOREST_ADDR\r\n" + 
+					"FROM FOREST\r\n" + 
+					"WHERE FOREST_NO= ? ";
 		return jdbc.selectOne(sql, param);
 	}
 	
-	//유저 시도시군 검색
-	public List<Map<String, Object>> user_sidogunSearch(List<Object> param) {
+	//유저 휴양림 검색
+	public List<Map<String, Object>> userForestSearch(List<Object> param) {
 		String sql = "SELECT B.FOREST_NO, B.ADM_NO, B.FOREST_NAME, B.FOREST_INTRO, B.FOREST_NOTICE, B.FOREST_ADDR,A.ROOM_NAME,A.ROOM_QTY\r\n" + 
-				"FROM FOREST_ROOM A, FOREST B\r\n" + 
-				"WHERE FOREST_ADDR LIKE '%'+?+'%' AND A.FOREST_NO=B.FOREST_NO;";
+	            "FROM FOREST_ROOM A, FOREST B\r\n" + 
+	            "WHERE FOREST_ADDR LIKE '%'||?||'%' AND A.FOREST_NO=B.FOREST_NO";
+
 		
 		return jdbc.selectList(sql, param);
 	}
@@ -261,17 +270,97 @@ public class ForestTripDao {
 	}
 	
 	//숙소 리뷰확인
-	public void review_Check(){
-		String sql = "SELECT B.FOREST_NAME,A.REVIEW_BODY,A.REVIEW_SCORE\r\n" + 
-				"FROM FOREST_REVIEW A, FOREST B\r\n" + 
-				"WHERE A.FOREST_NO=B.FOREST_NO AND B.FOREST_NAME LIKE '%'+ ? +'%'";
+	public List<Map<String, Object>> reviewCheck(List<Object> param){
+		String sql ="SELECT B.FOREST_NAME AS FOREST_NAME, C.ROOM_NAME AS ROOM_NAME,\r\n" + 
+					"A.REVIEW_BODY AS REVIEW_BODY, A.REVIEW_SCORE AS REVIEW_SCORE\r\n" + 
+					"FROM FOREST_REVIEW A, FOREST B, FOREST_ROOM C\r\n" + 
+					"WHERE A.FOREST_NO=B.FOREST_NO AND B.FOREST_NO = C.FOREST_NO AND B.FOREST_NO = ? ";
+		
+		return jdbc.selectList(sql, param);
 	}
 	
 	//숙소 예약하기
-	public void forest_Book(){
-		String sql = "INSERT INTO FOREST_BOOK (BOOK_NO, MEM_NO, ROOM_NO, BOOK_QTY, BOOK_D_START, BOOK_D_END)\r\n" + 
-				"VALUES ('B00004', 'M10004', 'R00004', 4, TO_DATE('20240509', 'YYYYMMDD'), TO_DATE('20240512', 'YYYYMMDD'))";
+	public void forest_Book(List<Object> param){
+		String sql ="INSERT INTO FOREST_BOOK (BOOK_NO, MEM_NO, ROOM_NO, BOOK_QTY, BOOK_D_START, BOOK_D_END)\r\n" + 
+	            "VALUES (\r\n" + 
+	            "(SELECT 'B' || TO_CHAR(MAX(TO_NUMBER(SUBSTR(BOOK_NO,2)))+1) FROM FOREST_BOOK),\r\n" +  
+	            "'M10004',\r\n" + 
+	            "'R10001',\r\n" + 
+	            "4, \r\n" + 
+	            "TO_DATE(?, 'YYYY-MM-DD'),\r\n" + 
+	            "TO_DATE(?, 'YYYY-MM-DD')\r\n" + 
+	            ")";
+
+		jdbc.update(sql, param);
 	}
+	
+	public List<Map<String, Object>> roomList(List<Object> param){
+		String sql ="SELECT A.FOREST_NAME, B.ROOM_NAME, C.REVIEW_BODY, C.REVIEW_SCORE\r\n" + 
+					"FROM FOREST A, FOREST_ROOM B, FOREST_REVIEW C\r\n" + 
+					"WHERE A.FOREST_NO = B.FOREST_NO AND A.FOREST_NO = C.FOREST_NO AND B.ROOM_NO = C.ROOM_NO AND A.FOREST_NO = ?";
+		return jdbc.selectList(sql, param);
+	}
+	
+	//총괄 관리자 통계보기(?없음)
+	public List<Map<String, Object>> super_adm_statistic(List<Object> param){
+		String sql="SELECT A.FOREST_NAME, ROUND(AVG(C.REVIEW_SCORE))\r\n" + 
+				"FROM FOREST A\r\n" + 
+				"JOIN FOREST_ADMIN B ON A.CODE = B.CODE AND A.ADM_NO = B.ADM_NO\r\n" + 
+				"JOIN FOREST_REVIEW C ON A.FOREST_NO = C.FOREST_NO\r\n" + 
+				"GROUP BY A.FOREST_NAME";
+		
+		return jdbc.selectList(sql, param);
+	}
+	
+	//시도관리자 통계보기
+	public void sido_adm_statistic() {
+		String sql = "SELECT A.FOREST_NAME, ROUND(AVG(C.REVIEW_SCORE)) \r\n" + 
+				"FROM FOREST A\r\n" + 
+				"JOIN FOREST_ADMIN B ON A.CODE = B.CODE AND A.ADM_NO = B.ADM_NO\r\n" + 
+				"JOIN FOREST_REVIEW C ON A.FOREST_NO = C.FOREST_NO\r\n" + 
+				"WHERE B.CODE = ? AND B.ROLL= 2\r\n" + 
+				"GROUP BY A.FOREST_NAME";
+	}
+	
+	//휴양림 관리자 통계보기
+	public void forest_adm_static() {
+		String sql = "SELECT A.FOREST_NAME, ROUND(AVG(C.REVIEW_SCORE)) \r\n" + 
+				"FROM FOREST A\r\n" + 
+				"JOIN FOREST_ADMIN B ON A.CODE = B.CODE AND A.ADM_NO = B.ADM_NO\r\n" + 
+				"JOIN FOREST_REVIEW C ON A.FOREST_NO = C.FOREST_NO\r\n" + 
+				"WHERE A.FOREST_NO = ? AND B.ROLL=3\r\n" + 
+				"GROUP BY A.FOREST_NAME";
+	}
+
+	//최고관리자용 휴양림 목록
+	public List<Map<String, Object>> superForestList(List<Object> param) {
+		// TODO Auto-generated method stub
+		String sql ="SELECT FOREST_NO, FOREST_NAME, FOREST_INTRO, FOREST_NOTICE, FOREST_ADDR\r\n" + 
+					"FROM FOREST WHERE ROWNUM >= ? AND ROWNUM <= ?";
+		
+		return jdbc.selectList(sql, param);
+	}
+	
+	//도담당자용 휴양림 목록
+	public List<Map<String, Object>> doForestList(List<Object> param) {
+		// TODO Auto-generated method stub
+		//code 제일 앞자리 2개가 시도코드
+		String sql ="SELECT FOREST_NO, FOREST_NAME, FOREST_INTRO, FOREST_NOTICE, FOREST_ADDR, CODE\r\n" + 
+					"FROM FOREST WHERE ROWNUM >= ? AND ROWNUM <= ? AND CODE BETWEEN ? ||'00000' AND ? ||'99999'";
+		
+		return jdbc.selectList(sql, param);
+	}
+
+	//시군담당자용 휴양림 목록
+	public List<Map<String, Object>> gunForestList(List<Object> param) {
+		// TODO Auto-generated method stub
+		String sql ="SELECT FOREST_NAME, FOREST_INTRO, FOREST_NOTICE, FOREST_ADDR\r\n" + 
+					"FROM FOREST WHERE ROWNUM >= ? AND ROWNUM <= ? AND ADM_NO = ?";
+		
+		return jdbc.selectList(sql, param);
+	}
+	
+	
 
 
 }

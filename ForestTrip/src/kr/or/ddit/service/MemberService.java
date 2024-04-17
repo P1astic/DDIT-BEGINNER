@@ -29,7 +29,7 @@ public class MemberService {
 		if (loginCheck == null) {
 			return false;
 		}
- 
+
 		ForestTripView.sessionStorage.put("mem_id", loginCheck.getMem_id());
 		ForestTripView.sessionStorage.put("mem_name", loginCheck.getMem_name());
 		ForestTripView.sessionStorage.put("mem_addr", loginCheck.getMem_addr());
@@ -60,6 +60,7 @@ public class MemberService {
 		forestDao.pwUpdate(param);
 
 	}
+
 	public void adminPWUpdate(List<Object> param) {
 		forestDao.adminPWUpdate(param);
 	}
@@ -71,47 +72,56 @@ public class MemberService {
 		}
 		return true;
 	}
-	
+
 	public void phoneUpdate(List<Object> param) {
 		forestDao.phoneUpdate(param);
 	}
-	
+
 	public void mailUpdate(List<Object> param) {
 		forestDao.mailUpdate(param);
 	}
-	
+
 	public void addressUpdate(List<Object> param) {
 		forestDao.addressUpdate(param);
 	}
-	
+
 	public boolean adminLogin(List<Object> param) {
 		AdminVo checkFlag = forestDao.adminLogin(param);
-		if(checkFlag == null) {
+		if (checkFlag == null) {
 			return false;
 		}
 		
+		ForestTripView.sessionStorage.put("adm_no", checkFlag.getAdm_no());
 		ForestTripView.sessionStorage.put("adm_id", checkFlag.getAdm_id());
 		ForestTripView.sessionStorage.put("adm_code", checkFlag.getCode());
 		ForestTripView.sessionStorage.put("adm_roll", checkFlag.getRoll());
-		
+		ForestTripView.sessionStorage.put("adm_no", checkFlag.getAdm_no());
+
 		return true;
 	}
 
 	public void userSignUp(List<Object> param) {
 		forestDao.userSignUp(param);
 	}
-	
+
 	public void adminSignUp(List<Object> param) {
 		forestDao.adminSignUp(param);
 	}
-	
+
 	public List<Map<String, Object>> adminList(List<Object> param) {
 		return forestDao.adminList(param);
 	}
-	
-	public List<Map<String, Object>> bookflagList(){
-		return forestDao.bookflagList();
+
+	public List<Map<String, Object>> bookflagList(List<Object> param) {
+		return forestDao.bookflagList(param);
 	}
-	
+
+	public boolean bookCheck(List<Object> param) {
+		List<BookVo> checkFlag = forestDao.bookCheck(param);
+		if (checkFlag.size() == 0) {
+			return false;
+		}
+		return true;
+	}
 
 }
